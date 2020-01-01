@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta content="width=device-width, initial-scale=1" name="viewport" />
+        <title>Good Surveys</title>
+        <link rel="stylesheet" href="style/normalize.css" type="text/css"/>        
+        <link rel="stylesheet" href="style/grid.css" type="text/css"/>
+        <link rel="stylesheet" href="style/default.css" type="text/css"/>    
+    </head>
+    <body>
+        <div id="background"></div>
+        <div class="container">
+            
+            <div class="row" id="header">
+                <div class="sixteen columns title">Surveys For Everyone
+                <div class="subtitle">${page_title!"Untitled page"}</div>
+                </div>
+            </div>
+            <div class="row" id="body">
+
+                <div class="three columns corner">
+                    <div class="menu">
+                        <ul>
+                            <li><a href="survey">All Surveys</a></li>
+                            <#if (username??)>
+                                <li><a href="survey_creation">New Survey</a></li>
+                                <li><a href="my_surveys">My Surveys</a></li>
+                                <#if (administrator == userType)>
+                                    <li><a href="new_user">Approve Manager</a></li>
+                                </#if>
+                            </#if>
+                        </ul>
+                    </div>
+                </div>
+                <div class="ten columns corner">
+                    <div class="padding">
+                        <#include content_tpl>
+                    </div>
+                </div>
+                <div class="three columns corner">
+                    <div class="menu menu2">
+                        <#if (username??)>
+                            ${(username)!}
+                            <ul>
+                                <li><a href="survey?logout">Logout</a></li>
+                            </ul>
+                        <#else>
+                            <ul>
+                                <li><a href="login">Manager Login</a></li>
+                            </ul>
+                        </#if>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row" id="footer">
+                    <div class="sixteen columns">Copyright &copy; 2014 ${defaults.author}. Page compiled on ${compiled_on?datetime}</div>
+            </div>
+        </div>
+    </body>
+</html>

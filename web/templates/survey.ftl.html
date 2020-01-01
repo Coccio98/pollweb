@@ -1,0 +1,145 @@
+<#if login??>
+    <form action="survey?n=#{survey.getId()}" method="post">       
+        <div class="login">
+            <#if error_autentication??>
+                <h3 class="error">${error_autentication}</h3>
+            </#if>
+            <label>Email</label>
+            <input type="email" name="email"/>
+            <label>Password</label>
+            <input type="password" name="password"/>
+            </br>
+            <input type="submit" name="login" value="Login" class="medium">
+        </div>
+    </form>
+<#else>
+
+<div class="titleAlign">
+    <h1>${survey.getTitle()}</h1>
+    <h2>${survey.getOpeningText()}</h2>
+</div>
+</br>
+<#if (survey.getQuestions()?size > 0)>
+    <form action="survey" method="post">
+        <#if p??>
+            ${p.getName()}
+        </#if>
+        <input type="hidden" name="n" value="${survey.id}">
+        <#list survey.getQuestions() as question>
+            <h3>${question.getText()}
+                <#if question.isMandatory()>
+                    *
+                </#if>
+            </h3>
+            <#if (send??)>
+            
+                <#if question.getQuestionType() == "choice">
+                    <#if answer[question?index]??>
+                        <#list answer[question?index].getOptions() as option>
+                            <h4 class="answer">${option.getText()}</h4>
+                        </#list>
+                    </#if>
+                <#else>
+                    <#if answer[question?index]??>
+                        <#assign item = answer[question?index].getAnswer()>
+                        <h4 class="answer">${item}</h4>
+                    </#if>
+                </#if>
+                
+            <#else>
+            
+                <#if question.getNote()??>
+                    <h4>${question.getNote()}</h4>
+                </#if>
+                <#if error?? && error[question?index]??>
+                    <h3 class="error">${error[question?index]}</h3>
+                </#if>
+                <#if question.getQuestionType() == "choice">
+                    <#if too_much?? && question?index == error_Number>
+                        <h3 class="error">${too_much}</h3>
+                    </#if>
+                    <#if answer?? && answer[question?index]??>               
+                        <#list question.getOptions() as choice>
+                            <#if answer[question?index].contains(choice)>
+                                <#if question.getMaxNumberOfChoices()==1>
+                                    <input type="radio" name=${question.getCode()} value=${choice.getPosition()} class="small" checked> ${choice.getText()} </br>
+                                <#else>
+                                    <input type="checkbox" name=${question.getCode()} value=${choice.getPosition()} class="small" checked> ${choice.getText()} </br>
+                                </#if>
+                            <#else>
+                                <#if question.getMaxNumberOfChoices()==1>
+                                    <input type="radio" name=${question.getCode()} value=${choice.getPosition()} class="small"> ${choice.getText()} </br>
+                                <#else>
+                                    <input type="checkbox" name=${question.getCode()} value=${choice.getPosition()} class="small"> ${choice.getText()} </br>
+                                </#if>
+                            </#if>
+                        </#list>
+                    <#else>
+                        <#list question.getOptions() as choice>
+                            <#if question.getMaxNumberOfChoices()==1>
+                                <input type="radio" name=${question.getCode()} value=${choice.getPosition()} class="small"> ${choice.getText()} </br>
+                            <#else>
+                                <input type="checkbox" name=${question.getCode()} value=${choice.getPosition()} class="small"> ${choice.getText()} </br>
+                            </#if>
+                        </#list>
+                    </#if>
+                    
+                </#if>
+                <#if question.getQuestionType() == "number">
+                    <#if answer?? && answer[question?index]??>
+                        <input type="number" name=${question.getCode()} class="medium" max=#{question.getMaxValue()} min=#{question.getMinValue()} value="#{answer[question?index].getAnswer()}">
+                    <#else>
+                        <input type="number" name=${question.getCode()} class="medium" max=#{question.getMaxValue()} min=#{question.getMinValue()}>
+                    </#if>
+                </#if>
+                <#if question.getQuestionType() == "short text">
+                    <#if answer?? && answer[question?index]??>
+                        <#if question.getMaxLength() != 0>
+                            <input type="text" name=${question.getCode()} class="medium" maxlength=#{question.getMaxLength()} minlength=#{question.getMinLength()} value="${answer[question?index].getAnswer()}">
+                        <#else>
+                            <input type="text" name=${question.getCode()} class="medium" minlength=#{question.getMinLength()} value="${answer[question?index].getAnswer()}">
+                        </#if>
+                    <#else>
+                        <#if question.getMaxLength() != 0>
+                            <input type="text" name=${question.getCode()} class="medium" maxlength=#{question.getMaxLength()} minlength=#{question.getMinLength()}>
+                        <#else>
+                            <input type="text" name=${question.getCode()} class="medium" minlength=#{question.getMinLength()}>
+                        </#if>
+                    </#if>
+                </#if>
+                <#if question.getQuestionType() == "long text">
+                    <#if answer?? && answer[question?index]??>
+                        <#if question.getMaxLength() != 0>
+                            <textarea name=${question.getCode()} maxlength=#{question.getMaxLength()} minlength=#{question.getMinLength()}>${answer[question?index].getAnswer()}</textarea>
+                        <#else>
+                            <textarea name=${question.getCode()} minlength=#{question.getMinLength()}>${answer[question?index].getAnswer()}</textarea>
+                        </#if>
+                    <#else>
+                        <#if question.getMaxLength() != 0>
+                            <textarea name=${question.getCode()} maxlength=#{question.getMaxLength()} minlength=#{question.getMinLength()}></textarea>
+                        <#else>
+                            <textarea name=${question.getCode()} minlength=#{question.getMinLength()}></textarea>
+                        </#if>
+                    </#if>
+                </#if>
+                <#if question.getQuestionType() == "date">
+                    <#if answer?? && answer[question?index]??>
+                        <input type="date" name=${question.getCode()} class="medium" max=${question.getMaxDate()} min=${question.getMinDate()} value="${answer[question?index].getAnswer()}">
+                    <#else>
+                        <input type="date" name=${question.getCode()} class="medium" max=${question.getMaxDate()} min=${question.getMinDate()}>
+                    </#if>
+                </#if>
+                
+            </#if>
+        </#list>
+        </br>
+        
+        <h3>${survey.getClosingText()}</h3>
+        
+        <#if (!send??)>
+            <input type="submit" name="send" value="Send" class="medium"/>
+        </#if>
+    </form>
+</#if>
+</br>
+</#if>

@@ -1,0 +1,329 @@
+/*
+    color1: #52B1FF
+    color2: #333333
+    color3: #FFFFFF
+    color4: #EBE0D3
+    color5: #C9ACE8
+*/
+
+body,html {
+    color: #333333;
+    padding:0; 
+    margin:0;
+    font-family: Lato, Verdana, Arial, Helvetica;
+    font-size: 11pt;
+    background-color: #EBE0D3;
+    background-image: url("../images/cardboard.png");
+}
+
+#header {    
+    right: 0;
+    height:50px;
+    font-size: 30pt;
+    font-weight: bold;
+    text-align: center;
+    padding-top: 5%;
+    padding-bottom: 5%;
+}
+
+.subtitle {
+    font-size: 50%;
+}
+
+.body {
+   background-color: white;
+   margin: 5% auto auto auto;
+   width: 50%;
+   padding: 1% 2% 2% 2%;
+}
+
+#footer {
+    height:30px;        
+    font-size: 9pt;
+    text-align: center;
+}
+
+input {
+    border: 1px solid #53829D;
+    background:  white;
+    font-size: 80%;
+}
+
+.menu{
+    font-size: 80%;
+    padding: 5px;
+    overflow: hidden;
+}
+
+.menu a {
+    color: inherit;
+    font-weight: bold;
+    text-decoration: none;
+    display: block;
+    padding: 5px;
+}
+
+.menu a:hover {
+    background-color: #333333;
+    color: white;
+}
+
+.menu ul {
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+
+.menu li {
+    margin:0;
+    padding:0;
+    display: block;
+}
+
+.figures {
+    overflow: hidden;
+}
+
+.figure {
+    border: 1px solid #CCC;
+    padding: 5px;
+    margin: 10px;
+    float:right;     
+}
+
+.figure img {
+    display: block;     
+}
+
+.figure .caption {
+    display: block;     
+    text-align: center;
+    font-size: 80%;
+}
+
+select,input,textarea,button {
+    width: 85%;
+    border-radius: 3px;
+    border: 2px solid #C9ACE8;
+}
+input {
+    height: 20px;
+}
+
+textarea {
+    height: 60px;
+}
+
+select.small,input.small,button.small {
+    width: 15%;
+}
+
+select.medium,input.medium,button.medium {
+    width: 40%;
+    font-size: 20px;
+}
+
+input[type="submit"]{
+    height: 30px;
+}
+
+input[type="button"]{
+    height: 30px;
+}
+
+.clabel {
+    font-weight: bold;
+}
+
+.corner {
+    border-radius: 10px;
+    box-shadow: 0 0 5px gray;
+    background-color: #FFFFFF;
+}
+
+.padding {
+    padding-left: 50px;
+    padding-right: 50px;
+}
+
+.titleAlign{
+    text-align: center;
+}
+
+#background {
+    width: 100%;
+    height: 300px;
+    background-color: #52B1FF;
+    box-shadow: 1px 0 3px gray;
+    background-image: url("../images/Liquid-Cheese.svg") ;
+    background-attachment: fixed;
+    background-size: cover;
+
+}
+.login{
+    display: flex;
+    flex-direction: column;
+    margin: 6% auto;
+    
+}
+.answer{
+    padding-left: 5%;
+    font-weight: normal;
+}
+.error{
+    color: red;
+    text-decoration: underline;
+    font-variant: normal;
+}
+
+h4 {
+    font-style: italic;
+    font-weight: lighter;
+}
+h5 {
+    text-transform: capitalize;
+}
+
+.plus{
+    padding-bottom: 5px;
+    text-align: center;
+    
+}
+
+.imgButton{
+    opacity:0.5;
+    cursor: pointer;
+}
+.imgButton.add{
+
+    width: 7%;
+}
+
+.imgButton.optDel{
+
+    width: 10px;
+}
+.imgButton.export{
+    border-radius: 50%;
+    background-color: #333333;
+    width: 40px;
+    height: 40px;
+}
+.export-img{
+    display: block;
+    padding: 8px;
+}
+.imgButton.eye{
+
+    border: 3px solid;
+    border-radius: 50%;
+    padding: 3px;
+}
+.eye.green{border-color: #008000}
+.eye.red{border-color: #ff0000}
+
+.imgButton:hover{
+    opacity:1;  
+}
+
+.lock{
+    width: 6%;
+    vertical-align: sub;
+}
+
+.border{
+    border-bottom: 1px solid #333333;
+}
+.title{
+    color: #FFFFFF;
+    text-shadow: 2px 2px 0 #333;
+}
+
+.wrapper{   
+  display: flex;
+}
+.left{
+    flex: 0 0 100%;
+}
+.rigth{
+    margin-left: -40%;
+    flex: 1;
+}
+.list{
+    list-style-type:decimal;
+}
+
+.select:hover{
+    cursor: text;
+}
+
+
+@media only screen and (max-width: 959px) {
+    body,html {    
+        font-size: 10pt;
+    }
+    #background {
+        height: 200px;
+    }
+    select.medium,input.medium {
+        width: 40%;
+        font-size: 15px;
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    
+    #header {
+        font-size: 20pt;
+    }
+    
+    table{
+        width: 100%
+    }
+    
+    .menu{ 
+        border-bottom: 2px dashed #C9ACE8;
+        background-color: transparent;
+    }
+    .menu2{ 
+        border-top: 2px dashed #C9ACE8;
+        border-bottom: 0;
+        background-color: transparent;
+    }
+   
+    #body{
+        border-radius: 10px;
+        box-shadow: 0 0 5px gray;
+        background-color: white;
+        margin-top: 10%;
+    }
+    select.medium,input.medium {
+        width: 100%;
+        font-size: 10px;
+    }
+    .imgButton{
+        transform: scale(0.8, 0.8);
+        -ms-transform: scale(0.8, 0.8); /* IE 9 */
+        -webkit-transform: scale(0.8, 0.8); /* Safari and Chrome */
+        -o-transform: scale(0.8, 0.8); /* Opera */
+        -moz-transform: scale(0.8, 0.8); /* Firefox */
+    }
+    .imgButton.add{
+        width: 40px;
+    }
+    .padding{
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    
+    .wrapper{   
+        display: initial;
+    }
+    .left{
+        flex: 0 1 auto;
+    }
+    .rigth{
+        flex: 0 1 auto;
+        margin-left: 0;
+    }
+}

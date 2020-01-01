@@ -1,0 +1,74 @@
+<#if (surveys??)>
+    <h1>All Surveys</h1>
+    <#if (surveys?size > 0)>
+        <table width="100%" class="row">
+            <#list surveys as survey>
+                <tr class="border">
+                    <td>
+                        <h3>${survey.getTitle()}
+                            <#if (survey.isReserved())>
+                                <img src="images/lock.svg" alt="reserved" title="Reserved" class=""/>
+                            </#if>
+                        </h3>
+                        <input type="text" value="localhost:8080/pollweb/survey?n=${survey.getId()}" disabled="true" class="select">
+                    </td>
+                    <td>
+                        <div title="Export Response" class="imgButton export" onclick="location.href='my_surveys?exp=${survey.getId()}'">
+                            <img src="images/export.svg" alt="export" class="export-img"/>
+                        </div>
+                    </td>
+                    <td>
+                        <#if (survey.isReserved())>
+                            <img src="images/add-users.svg" alt="user" title="Add User" class="imgButton" onclick="location.href='my_surveys?u=${survey.getId()}'"/>
+                        </#if>
+                    </td>
+                    <td>
+                        <#if survey.isActive()>
+                            <img src="images/eye.svg" alt="eye" title="Disable" class="imgButton eye green" onclick="location.href='my_surveys?d=${survey.getId()}'"/> 
+                        <#else>
+                            <img src="images/eye-closed.svg" alt="eye-close" title="Enable" class="imgButton eye red" onclick="location.href='my_surveys?e=${survey.getId()}'"/> 
+                        </#if>
+                    </td>
+                    <td>                           
+                        <img src="images/pencil.svg" alt="Edit" title="Edit" class="imgButton"  onclick="location.href='my_surveys?m=${survey.getId()}'" />                         
+                    </td>
+                </tr>
+            </#list>
+        </table>
+    </#if>
+    <div class="plus">
+        <img src="images/plus.svg" alt="add" class="imgButton add" title="Add Survey" onclick="location.href='survey_creation'" />
+    </div>
+</#if>
+<#if u??>
+    <div class="wrapper">
+        <div class="left">
+        <#if error??>
+        <h3 class="error">${error}</h3>
+        </#if>
+        <form action="my_surveys" method="post">
+            <input type="hidden" name="u" value=${u.getId()}>
+            <h3>Full Name*</h3>
+            <input type="text" name="name" class="medium">
+            <h3>E-mail*</h3>
+            <input type="email" name="email" class="medium">
+            <h3>Password*</h3>
+            <input type="password" name="password" class="medium"></br></br>
+            <input type="submit" name="send" value="Send" class="medium"/></br></br>
+        </form>
+        </div>
+        <div class="rigth">
+            <h3>All Participants</h3>
+            <ul class="list">
+                <#list u.getParticipants() as participant>
+                    <h3>
+                        <li>
+                        ${participant.getName()}
+                        ${participant.getEmail()}
+                        </li>
+                    </h3>
+                </#list>
+            </ul>
+        </div>
+    </div>
+</#if>

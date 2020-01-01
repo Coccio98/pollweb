@@ -1,0 +1,83 @@
+<#if (survey??)>
+    <h1>${survey.getTitle()}</h1>
+    <h2>${survey.getOpeningText()}</h2>
+    <#if (survey.isReserved())>
+        <h3><li>
+            Reserved Survey
+        </li></h3>
+    <#else>
+        <h3><li>
+            Public Survey
+        </li></h3>
+    </#if>
+    <table width="100%" class="row">       
+        <#list survey.getQuestions() as question>
+            <tr class="border">
+                <td>
+                    <h3>${question.getPosition()+1}. ${question.getText()}</h3>
+                    <h4>${question.getNote()}</h4>
+
+                    <h5>${question.getQuestionType()} question</h5>
+                    <#if question.isMandatory()>
+                        <h5>Mandatory </h5>
+                    <#else>
+                        <h5>Not Mandatory</h5>
+                    </#if>
+                    <#switch question.getQuestionType()>
+                        <#case "choice">
+                            <#list question.getOptions() as option>
+                                <h3>${option.getPosition()+1}. ${option.getText()}</h3>
+                            </#list>
+                            <h5>Max Number of Choices: ${question.getMaxNumberOfChoices()}</h5>
+                            <h5>Min Number of Choices: ${question.getMinNumberOfChoices()}</h5>
+                        <#break>
+                        <#case "date">
+                            <h5>Max: ${question.getMaxDate()}</br>
+                                Min: ${question.getMinDate()}
+                            </h5>
+                        <#break>
+                        <#case "long text">
+                            <h5>Max: ${question.getMaxLength()}</br>
+                                Min: ${question.getMinLength()}
+                            </h5>
+                        <#break>
+                        <#case "short text">
+                            <h5>Max: ${question.getMaxLength()}</br>
+                                Min: ${question.getMinLength()}</br>
+                                Regular Expression: ${question.getPattern()}
+                            </h5>
+                        <#break>
+                        <#case "number">
+                            <h5>Max: ${question.getMaxValue()}</br>
+                                Min: ${question.getMinValue()}
+                            </h5>
+                        <#break>
+                        <#default>
+                    </#switch>
+                </td>
+                <td>                    
+                    <#if (question.getPosition() != 0)>
+                    <div>
+                        <img src="images/up.svg" alt="Up" class="imgButton" title="Bring Up" onclick="location.href='my_surveys?m=${survey.getId()}&up=${question.getPosition()}' "/>
+                    </div>
+                    </#if>
+                    <#if (question.getPosition() != (survey.getQuestions()?size - 1))>
+                    <div>
+                        <img src="images/down.svg" alt="Down" class="imgButton" title="Bring Down" onclick="location.href='my_surveys?m=${survey.getId()}&down=${question.getPosition()}'"/>
+                    </div>
+                    </#if>
+                </td>
+                <td>
+                    <img src="images/pencil.svg" alt="Edit" class="imgButton" title="Edit" onclick="location.href='my_surveys?m1=${survey.getId()}&m2=${question.getId()}'"/>
+                </td>
+                <td>
+                    <img src="images/delete.svg" alt="Delete" class="imgButton" title="Delete" onclick="location.href='my_surveys?m=${survey.getId()}&del=${question.getPosition()}'"/>
+                </td>
+            </tr>
+        </#list>     
+    </table>
+    <h2>${survey.getClosingText()}</h2>
+    <div class="plus">
+        <img src="images/plus.svg" alt="add" title="Add Question" class="imgButton add" onclick="location.href='my_surveys?a=${survey.getId()}'" />
+    </div>
+</#if>

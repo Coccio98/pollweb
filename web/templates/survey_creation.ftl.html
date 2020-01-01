@@ -1,0 +1,94 @@
+
+<form action="survey_creation" method="post">
+    <h3 class="error">${(error_creation)!}</h3>
+    <#if (!surveyId??)>
+        
+        <h3>Survey's Title</h3>
+        <input type="text" name="title" class="medium"/>
+        <h3>Survey's Opening Text</h3>
+        <input type="text" name="openT" class="medium"/>
+        <h3>Survey's Closing Text</h3>
+        <input type="text" name="closeT" class="medium"/>
+        <h3>Is Survey Reserved?</h3>
+        <input type="radio" name="reserved" value="yes" class="small"/>Yes</br>
+        <input type="radio" name="reserved" value="no" class="small"/>No</br></br>
+        <input type="submit" name="create" value="Create" class="medium"/></br></br>
+    <#else>    
+        <input type="hidden" name="surveyId" value="${surveyId}"/>
+        <input type="hidden" name="position" value="${position}"/>
+        <#if (!type??)>
+            <h3>Question*</h3>
+            <input type="text" name="text" class="medium"/>
+            <h3>Note</h3>
+            <input type="text" name="note" class="medium"/>
+            <h3>Is Mandatory?*</h3>
+            <input type="radio" name="mandatory" value="yes" class="small"/>Yes</br>
+            <input type="radio" name="mandatory" value="no" class="small"/>No</br>
+            <h3>Add a Question</h3>
+            <h4>Wich one do you want to add?</h4>
+            <div><select name="type" class="medium">
+                <option value="shortText">Short Text</option>
+                <option value="longText">Long Text</option>
+                <option value="number">Number</option>
+                <option value="date">Date</option>
+                <option value="choice">Choice</option>
+            </select>        
+            <input type="submit" name="addQuestion" value="Add Question" class="medium"/></div></br>
+            <input type="button" value="Recap" onclick="location.href='my_surveys?m=${surveyId}'" class="medium"/></br></br>
+            <input type="button" value="End" onclick="location.href='my_surveys'" class="medium"/></br></br>
+        <#else>
+            <input type="hidden" name="surveyId" value="${surveyId}"/>
+            <input type="hidden" name="position" value="${position}"/>
+            <input type="hidden" name="questionId" value="${questionId}"/>
+            <#if (!choices??)>
+                <input type="hidden" name="type" value="${type}"/>
+                <#switch type>
+                    <#case "shortText">
+                        <h3>Max Length (max 240)</h3>
+                        <input type="number" name="maxValue" min=0 max=240 class="medium"/>
+                        <h3>Min Length</h3>
+                        <input type="number" name="minValue" min=0 max=240 class="medium"/>
+                        <h3>Regular Expression</h3>
+                        <input type="text" name="expression" class="medium"/>
+                    <#break>
+                    <#case "longText">
+                        <h3>Max Length (max 10.000)</h3>
+                        <input type="number" name="maxValue" min=0 max=10000 class="medium"/>
+                        <h3>Min Length</h3>
+                        <input type="number" name="minValue" min=0 max=10000 class="medium"/>
+                    <#break>
+                    <#case "number">
+                        <h3>Max Value</h3>
+                        <input type="number" name="maxValue" class="medium"/>
+                        <h3>Min Value</h3>
+                        <input type="number" name="minValue" class="medium"/>
+                    <#break>
+                    <#case "date">
+                        <h3>Max Date</h3>
+                        <input type="date" name="maxValue" min="0001-01-01" class="medium"/>
+                        <h3>Min Date</h3>
+                        <input type="date" name="minValue" min="0001-01-01" class="medium"/>
+                    <#break>
+                    <#case "choice"> 
+                        <h3>Number of Choice*</h3>
+                        <input type="number" name="number" min=0 class="medium"/>
+                        <h3>Max Choice</h3>
+                        <input type="number" name="maxValue" min=0 class="medium"/>
+                        <h3>Min Choice</h3>
+                        <input type="number" name="minValue" min=0 class="medium"/>
+                    <#break>
+                    <#default>
+                </#switch>
+                <input type="submit" name="saveQuestion" value="Save Question" class="medium"/></br></br>
+            <#else>
+                <h3>Add all the Options*</h3>
+                <#assign x = (choices?number)>
+                <#list 1..x as i>
+                    <h3>Option ${i}</h3>
+                    <input type="text" name="option" class="medium"/>
+                </#list>
+                <input type="submit" name="saveOptions" value="Save Options" class="medium"/></br></br>
+            </#if>
+        </#if>
+    </#if>
+</form>   

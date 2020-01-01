@@ -1,0 +1,64 @@
+<#if question??>
+    <form action="my_surveys" method="post">
+        <input type="hidden" name="m1" value=${m1}>
+        <input type="hidden" name="m2" value=${m2}>
+        <h3>Question *</h3>
+        <input type="text" name="text" class="medium" value="${question.getText()}"/>
+        <h3>Note</h3>
+        <input type="text" name="note" class="medium" value="${question.getNote()}"/>
+        <h3>Is Mandatory? *</h3>
+        <#if question.isMandatory()>
+            <input type="radio" name="mandatory" value="yes" class="small" checked/>Yes</br>
+            <input type="radio" name="mandatory" value="no" class="small"/>No</br>
+        <#else>
+            <input type="radio" name="mandatory" value="yes" class="small"/>Yes</br>
+            <input type="radio" name="mandatory" value="no" class="small" checked/>No</br>
+        </#if>
+        <#switch question.getQuestionType()>
+            <#case "short text">
+                <h3>Max Length (max 240)</h3>
+                <input type="number" name="maxValue" min=0 max=240 class="medium" value="#{question.getMaxLength()}"/>
+                <h3>Min Length</h3>
+                <input type="number" name="minValue" min=0 max=240 class="medium" value="#{question.getMinLength()}"/>
+                <h3>Regular Expression</h3>
+                <input type="text" name="expression" class="medium" value="${question.getPattern()}"/>
+            <#break>
+            <#case "long text">
+                <h3>Max Length (max 10.000)</h3>
+                <input type="number" name="maxValue" min=0 max=10000 class="medium" value="#{question.getMaxLength()}"/>
+                <h3>Min Length</h3>
+                <input type="number" name="minValue" min=0 max=10000 class="medium" value="#{question.getMinLength()}"/>
+            <#break>
+            <#case "number">
+                <h3>Max Value</h3>
+                <input type="number" name="maxValue" class="medium" value="#{question.getMaxValue()}"/>
+                <h3>Min Value</h3>
+                <input type="number" name="minValue" class="medium" value="#{question.getMinValue()}"/>
+            <#break>
+            <#case "date">
+                <h3>Max Date</h3>
+                <input type="date" name="maxValue" min="0001-01-01" class="medium" value="${question.getMaxDate()}"/>
+                <h3>Min Date</h3>
+                <input type="date" name="minValue" min="0001-01-01" class="medium" value="${question.getMinDate()}"/>
+            <#break>
+            <#case "choice">
+                <table width="40%" class="row">
+                    <#list question.getOptions() as option>
+                        <tr class="border">
+                            <td><h3>${option.getPosition()+1}. ${option.getText()}</h3></td>
+                            <td><img src="images/cancel.svg" alt="Delete" class="imgButton optDel" title="Delete" onclick="location.href='my_surveys?m1=${m1}&m2=${m2}&del=${option.getPosition()}'"/></td>
+                        </tr>
+                    </#list>
+                </table>
+                <input type="text" name="option" class="medium"/></br></br>
+                <input type="submit" name="addOption" class="medium" value="Add Option"/>
+                <h3>Max Choice</h3>
+                <input type="number" name="maxValue" min=0 class="medium" value="#{question.getMaxNumberOfChoices()}"/>
+                <h3>Min Choice</h3>
+                <input type="number" name="minValue" min=0 class="medium" value="#{question.getMinNumberOfChoices()}"/>               
+            <#break>
+            <#default>
+            </#switch></br></br>
+        <input type="submit" name="save" value="Save" class="medium"/></br></br>
+    </form>
+</#if>

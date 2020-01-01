@@ -1,0 +1,32 @@
+<div class="wrapper">
+    <div class="left">
+        <#if error??>
+            <h3 class="error">${error}</h3>
+        </#if>
+        <form action="new_user" method="post">
+            <h3>Name*</h3>
+            <input type="text" name="name" class="medium"/>
+            <h3>Surname*</h3>
+            <input type="text" name="surname" class="medium"/>
+            <h3>E-mail*</h3>
+            <input type="email" name="email" class="medium"/>
+            <h3>Password*</h3>
+            <input type="password" name="password" class="medium"></br></br>
+            <input type="submit" name="add" value="Add" class="medium"/></br></br>
+        </form>
+    </div>
+    <div class="rigth">
+        <h3>All User</h3>
+        <ul class="list">
+            <#list users as user>
+                <h3>
+                    <li>
+                    ${user.getName()}
+                    ${user.getSurname()}
+                    ${user.getEmail()}
+                    </li>
+                </h3>
+            </#list>
+        </ul>
+    </div>
+</div>
