@@ -8,23 +8,23 @@
     </resource-ref>
     <servlet>
         <servlet-name>survey</servlet-name>
-        <servlet-class>it.univaq.f4i.iw.pollweb.business.controller.SurveyController</servlet-class>
+        <servlet-class>it.univaq.f4i.iw.pollweb.controller.SurveyController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>login</servlet-name>
-        <servlet-class>it.univaq.f4i.iw.pollweb.business.controller.LoginController</servlet-class>
+        <servlet-class>it.univaq.f4i.iw.pollweb.controller.LoginController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>survey_creation</servlet-name>
-        <servlet-class>it.univaq.f4i.iw.pollweb.business.controller.SurveyCreationController</servlet-class>
+        <servlet-class>it.univaq.f4i.iw.pollweb.controller.SurveyCreationController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>my_surveys</servlet-name>
-        <servlet-class>it.univaq.f4i.iw.pollweb.business.controller.MySurveyController</servlet-class>
+        <servlet-class>it.univaq.f4i.iw.pollweb.controller.MySurveyController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>new_user</servlet-name>
-        <servlet-class>it.univaq.f4i.iw.pollweb.business.controller.NewUserController</servlet-class>
+        <servlet-class>it.univaq.f4i.iw.pollweb.controller.NewUserController</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>survey</servlet-name>
@@ -38,7 +38,7 @@
         <servlet-name>survey_creation</servlet-name>
         <url-pattern>/survey_creation</url-pattern>
     </servlet-mapping>
-     <servlet-mapping>
+    <servlet-mapping>
         <servlet-name>my_surveys</servlet-name>
         <url-pattern>/my_surveys</url-pattern>
     </servlet-mapping>
@@ -58,7 +58,7 @@
         <param-name>view.outline_template</param-name>
         <param-value>outline.ftl.html</param-value>
     </context-param>
-        <context-param>
+    <context-param>
         <param-name>view.date_format</param-name>
         <param-value>dd/MM/yyyy hh:mm:ss</param-value>
     </context-param>
@@ -70,7 +70,7 @@
         <param-name>view.template_directory</param-name>
         <param-value>templates</param-value>
     </context-param>
-     <context-param>
+    <context-param>
         <param-name>view.data.homepage_url</param-name>
         <param-value>homepage</param-value>
     </context-param>
