@@ -8,8 +8,8 @@ package it.univaq.f4i.iw.pollweb.data.dao;
 import it.univaq.f4i.iw.framework.data.DAO;
 import it.univaq.f4i.iw.framework.data.DataException;
 import it.univaq.f4i.iw.framework.data.DataLayer;
-import it.univaq.f4i.iw.pollweb.business.model.User;
-import it.univaq.f4i.iw.pollweb.data.dao.UserDAO;
+import it.univaq.f4i.iw.pollweb.data.model.User;
+import it.univaq.f4i.iw.pollweb.data.proxy.UserProxy;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,12 +21,12 @@ import java.util.List;
  *
  * @author andrea
  */
-public class UserDAOImpl extends DAO implements UserDAO {
+public class UserDAO_MySQL extends DAO implements UserDAO {
 
-    private PreparedStatement sUser,sUserById, sUserByEmail, sUserByEmailAndPassword;
+    private PreparedStatement sUser,sUserById, sUserByEmailAndPassword;
     private PreparedStatement iUser, uUser, dUser;
     
-    public UserDAOImpl(DataLayer d) {
+    public UserDAO_MySQL(DataLayer d) {
         super(d);
     }
 
@@ -35,7 +35,6 @@ public class UserDAOImpl extends DAO implements UserDAO {
         try {
             sUser.close();
             sUserById.close();
-            sUserByEmail.close();
             sUserByEmailAndPassword.close();
             iUser.close();
             uUser.close();
@@ -45,13 +44,17 @@ public class UserDAOImpl extends DAO implements UserDAO {
         } 
         super.destroy();
     }
+    
+    @Override
+    public UserProxy createUser() {
+        return new UserProxy(getDataLayer());
+    }
 
     @Override
     public void init() throws DataException {
         try {
-            sUser = connection.prepareStatement("SELECT * FROM users");;
+            sUser = connection.prepareStatement("SELECT * FROM users");
             sUserById = connection.prepareStatement("SELECT * FROM users WHERE id=?");
-            sUserByEmail = connection.prepareStatement("SELECT * FROM users WHERE email=?");
             sUserByEmailAndPassword = connection.prepareStatement("SELECT * FROM users WHERE email=? AND password=?");
             iUser = connection.prepareStatement("INSERT INTO users (name,surname,email,password,role) VALUES (?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
             uUser = connection.prepareStatement("UPDATE users SET name=?,surname=?,email,password=?,role=? WHERE id=?");
@@ -63,7 +66,7 @@ public class UserDAOImpl extends DAO implements UserDAO {
     
     private User createUser(ResultSet rs) throws DataException{
         try {
-            User u = new User();
+            UserProxy u = createUser();
             u.setId(rs.getLong("id"));
             u.setEmail(rs.getString("email"));
             u.setPassword(rs.getString("password"));
@@ -112,27 +115,6 @@ public class UserDAOImpl extends DAO implements UserDAO {
         }
     }
     
-    @Override
-    public User findByEmail(String email) throws DataException {
-        ResultSet rs = null;
-        User user = null;
-        try {
-            sUserByEmail.setString(1, email);
-            rs = sUserByEmail.executeQuery();
-            if (rs.next()) {
-                user = createUser(rs);
-            }
-            return user;
-        } catch (SQLException ex) {
-            throw new DataException("Unable to load user by email", ex);
-        } finally {
-            try {
-                rs.close();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        }
-    }
     
     @Override
     public User findByEmailAndPassword(String email, String password) throws DataException {

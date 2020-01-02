@@ -1,6 +1,6 @@
 package it.univaq.f4i.iw.framework.security;
 
-import it.univaq.f4i.iw.pollweb.business.model.User;
+import it.univaq.f4i.iw.pollweb.data.model.User;
 import java.io.IOException;
 import java.util.Calendar;
 import javax.servlet.ServletException;

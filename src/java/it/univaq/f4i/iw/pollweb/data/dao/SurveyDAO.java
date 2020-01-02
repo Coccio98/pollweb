@@ -6,9 +6,9 @@
 package it.univaq.f4i.iw.pollweb.data.dao;
 
 import it.univaq.f4i.iw.framework.data.DataException;
-import it.univaq.f4i.iw.pollweb.business.model.ReservedSurvey;
-import it.univaq.f4i.iw.pollweb.business.model.User;
-import it.univaq.f4i.iw.pollweb.business.model.Survey;
+import it.univaq.f4i.iw.pollweb.data.model.ReservedSurvey;
+import it.univaq.f4i.iw.pollweb.data.model.User;
+import it.univaq.f4i.iw.pollweb.data.model.Survey;
 import java.sql.ResultSet;
 import java.util.List;
 
@@ -25,7 +25,6 @@ public interface SurveyDAO {
     Survey findByIdOpen(long id) throws DataException;
     List<Survey> findByManager(User manager) throws DataException;
     List<Survey> findAllNotReserved() throws DataException;
-    List<Survey> findAll() throws DataException;
     void saveOrUpdate(Survey survey) throws DataException;
     void delete(Survey survey) throws DataException;
 }

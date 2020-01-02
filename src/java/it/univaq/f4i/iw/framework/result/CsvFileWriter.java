@@ -6,9 +6,9 @@
 package it.univaq.f4i.iw.framework.result;
 
 import it.univaq.f4i.iw.framework.data.DataException;
-import it.univaq.f4i.iw.pollweb.business.model.Answer;
-import it.univaq.f4i.iw.pollweb.business.model.Survey;
-import it.univaq.f4i.iw.pollweb.business.model.SurveyResponse;
+import it.univaq.f4i.iw.pollweb.data.model.Answer;
+import it.univaq.f4i.iw.pollweb.data.model.Survey;
+import it.univaq.f4i.iw.pollweb.data.model.SurveyResponse;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -46,7 +46,7 @@ public class CsvFileWriter {
                 List<Answer> answers = response.getAnswers();
                 for(Answer answer: answers){
                     fileWriter.append(String.valueOf(i));
-                    fileWriter.append(COMMA_DELIMITER);                    
+                    fileWriter.append(COMMA_DELIMITER);
                     fileWriter.append(String.valueOf(answer.getQuestion().getPosition() + 1));              
                     fileWriter.append(COMMA_DELIMITER);
                     fileWriter.append(answer.toString());

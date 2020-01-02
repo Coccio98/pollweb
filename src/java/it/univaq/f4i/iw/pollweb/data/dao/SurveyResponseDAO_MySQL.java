@@ -8,11 +8,9 @@ package it.univaq.f4i.iw.pollweb.data.dao;
 import it.univaq.f4i.iw.framework.data.DAO;
 import it.univaq.f4i.iw.framework.data.DataException;
 import it.univaq.f4i.iw.framework.data.DataLayer;
-import it.univaq.f4i.iw.pollweb.business.model.Answer;
-import it.univaq.f4i.iw.pollweb.business.model.Survey;
-import it.univaq.f4i.iw.pollweb.business.model.SurveyResponse;
-import it.univaq.f4i.iw.pollweb.data.dao.AnswerDAO;
-import it.univaq.f4i.iw.pollweb.data.dao.SurveyResponseDAO;
+import it.univaq.f4i.iw.pollweb.data.model.Answer;
+import it.univaq.f4i.iw.pollweb.data.model.Survey;
+import it.univaq.f4i.iw.pollweb.data.model.SurveyResponse;
 import it.univaq.f4i.iw.pollweb.data.proxy.SurveyResponseProxy;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -26,12 +24,12 @@ import java.util.List;
  *
  * @author andrea
  */
-public class SurveyResponseDAOImpl extends DAO implements SurveyResponseDAO {
+public class SurveyResponseDAO_MySQL extends DAO implements SurveyResponseDAO {
 
     private PreparedStatement sResponseById, sResponsesBySurvey;
-    private PreparedStatement iResponse, uResponse, dResponse;
+    private PreparedStatement iResponse;
     
-    public SurveyResponseDAOImpl(DataLayer d) {
+    public SurveyResponseDAO_MySQL(DataLayer d) {
         super(d);
     }
 
@@ -41,12 +39,15 @@ public class SurveyResponseDAOImpl extends DAO implements SurveyResponseDAO {
             sResponseById.close();
             sResponsesBySurvey.close();
             iResponse.close();
-            uResponse.close();
-            dResponse.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
         super.destroy();
+    }
+    
+    @Override
+    public SurveyResponseProxy createSurveyResponse() {
+        return new SurveyResponseProxy(getDataLayer());
     }
 
     @Override
@@ -55,8 +56,6 @@ public class SurveyResponseDAOImpl extends DAO implements SurveyResponseDAO {
             sResponsesBySurvey = connection.prepareStatement("SELECT * FROM survey_responses WHERE id_survey=?");
             sResponseById = connection.prepareStatement("SELECT * FROM survey_responses WHERE id=?");
             iResponse = connection.prepareStatement("INSERT INTO survey_responses (submission_date,id_survey,id_participant) VALUES (?,?,?)", Statement.RETURN_GENERATED_KEYS);
-            uResponse = connection.prepareStatement("UPDATE survey_responses SET submission_date=?,id_survey=?,id_participant=? WHERE id=?");
-            dResponse = connection.prepareStatement("DELETE FROM survey_responses WHERE id=?");
         } catch (SQLException ex) {
             throw new DataException("Error initializing Data Layer", ex);
         }
@@ -144,16 +143,6 @@ public class SurveyResponseDAOImpl extends DAO implements SurveyResponseDAO {
             }
         } else {
             
-        }
-    }
-
-    @Override
-    public void delete(SurveyResponse sr) throws DataException {
-        try {
-            dResponse.setLong(1, sr.getId());
-            dResponse.execute();
-        } catch (SQLException ex) {
-            throw new DataException("Unable to delete response", ex);
         }
     }
 }

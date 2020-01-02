@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.univaq.f4i.iw.pollweb.business.controller;
+package it.univaq.f4i.iw.pollweb.controller;
 
 import it.univaq.f4i.iw.framework.data.DataLayer;
 import it.univaq.f4i.iw.framework.result.FailureResult;
-import it.univaq.f4i.iw.pollweb.business.model.User;
+import it.univaq.f4i.iw.pollweb.data.model.User;
 import it.univaq.f4i.iw.pollweb.data.dao.Pollweb_DataLayer;
 import java.io.IOException;
 import javax.annotation.Resource;

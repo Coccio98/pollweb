@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.univaq.f4i.iw.pollweb.business.model;
+package it.univaq.f4i.iw.pollweb.data.impl;
 
+import it.univaq.f4i.iw.pollweb.data.model.ChoiceAnswer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,24 +13,27 @@ import java.util.List;
  *
  * @author andrea
  */
-public class ChoiceAnswer extends Answer {
+public class ChoiceAnswerImpl extends AnswerImpl implements ChoiceAnswer{
     
-    private List<Option> answers;
+    private List<OptionImpl> answers;
     
-    public ChoiceAnswer() {
+    public ChoiceAnswerImpl() {
         this.answers = new ArrayList<>();
     }
-
-    public List<Option> getOptions() {
+    
+    @Override
+    public List<OptionImpl> getOptions() {
         return answers;
     }
-
-    public void setAnswers(List<Option> answers) {
+    
+    @Override
+    public void setAnswers(List<OptionImpl> answers) {
         this.answers = answers;
     }
     
-    public boolean contains(Option option){
-        for(Option o: this.answers){
+    @Override
+    public boolean contains(OptionImpl option){
+        for(OptionImpl o: this.answers){
             if(o.getText().equals(option.getText())){
                 return true;
             }
@@ -39,8 +43,8 @@ public class ChoiceAnswer extends Answer {
     
     @Override
     public boolean isValid(){ 
-        if(this.getQuestion() != null && (this.getQuestion() instanceof ChoiceQuestion)){
-            ChoiceQuestion question =(ChoiceQuestion) this.getQuestion();
+        if(this.getQuestion() != null && (this.getQuestion() instanceof ChoiceQuestionImpl)){
+            ChoiceQuestionImpl question =(ChoiceQuestionImpl) this.getQuestion();
         
             if((question.getMaxNumberOfChoices()!= question.UNCOSTRAINED) && (
                     question.getMaxNumberOfChoices() < this.getOptions().size())){
@@ -59,7 +63,7 @@ public class ChoiceAnswer extends Answer {
     @Override
     public String toString() {
         String s = "";
-        for(Option o: this.getOptions()){
+        for(OptionImpl o: this.getOptions()){
             s = s + o.getPosition() + ". " + o.getText() + ",";
         }
         return s;

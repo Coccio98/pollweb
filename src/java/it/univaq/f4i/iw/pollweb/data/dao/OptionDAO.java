@@ -6,9 +6,9 @@
 package it.univaq.f4i.iw.pollweb.data.dao;
 
 import it.univaq.f4i.iw.framework.data.DataException;
-import it.univaq.f4i.iw.pollweb.business.model.ChoiceQuestion;
-import it.univaq.f4i.iw.pollweb.business.model.Option;
-import it.univaq.f4i.iw.pollweb.business.model.Question;
+import it.univaq.f4i.iw.pollweb.data.impl.ChoiceQuestionImpl;
+import it.univaq.f4i.iw.pollweb.data.impl.OptionImpl;
+import it.univaq.f4i.iw.pollweb.data.model.Question;
 import java.util.List;
 
 /**
@@ -17,8 +17,8 @@ import java.util.List;
  */
 public interface OptionDAO {
     
-    List<Option> findByQuestion(Question question) throws DataException;
-    void saveOrUpdate(Option option, long questionId) throws DataException;
-    void delete(ChoiceQuestion question, int del) throws DataException;
+    List<OptionImpl> findByQuestion(Question question) throws DataException;
+    void saveOrUpdate(OptionImpl option, long questionId) throws DataException;
+    void delete(ChoiceQuestionImpl question, int del) throws DataException;
     void deleteByQuestion(long question) throws DataException;
 }

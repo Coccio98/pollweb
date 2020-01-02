@@ -3,30 +3,31 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.univaq.f4i.iw.pollweb.business.model;
+package it.univaq.f4i.iw.pollweb.data.impl;
 
+import it.univaq.f4i.iw.pollweb.data.model.ShortTextAnswer;
 import java.util.regex.Pattern;
 
 /**
  *
  * @author andrea
  */
-public class ShortTextAnswer extends TextAnswer {
+public class ShortTextAnswerImpl extends TextAnswerImpl implements ShortTextAnswer{
 
     @Override
     public boolean isValid() {
-        if(this.getQuestion()!= null && (this.getQuestion() instanceof ShortTextQuestion)){
-            ShortTextQuestion question =(ShortTextQuestion) this.getQuestion();
+        if(this.getQuestion()!= null && (this.getQuestion() instanceof ShortTextQuestionImpl)){
+            ShortTextQuestionImpl question =(ShortTextQuestionImpl) this.getQuestion();
         
-            if((question.getMaxLength()!= TextQuestion.UNCOSTRAINED) && (
+            if((question.getMaxLength()!= TextQuestionImpl.UNCOSTRAINED) && (
                     getAnswer().length() > question.getMaxLength())){
                 return false;       
             }
-            if((question.getMinLength()!= TextQuestion.UNCOSTRAINED) && (
+            if((question.getMinLength()!= TextQuestionImpl.UNCOSTRAINED) && (
                     getAnswer().length() < question.getMinLength())){
                 return false;
             }
-            if (!(question.getPattern().equals(ShortTextQuestion.UNCOSTRAINED)) &&
+            if (!(question.getPattern().equals(ShortTextQuestionImpl.UNCOSTRAINED)) &&
                     !(Pattern.matches(question.getPattern(), question.getText()))) {
                 return false;
             }

@@ -3,15 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.univaq.f4i.iw.pollweb.business.model;
+package it.univaq.f4i.iw.pollweb.data.impl;
 
-import java.util.Objects;
+import it.univaq.f4i.iw.pollweb.data.model.Question;
+
 
 /**
  *
  * @author andrea
  */
-public class Question {
+public abstract class QuestionImpl implements Question{
     
     private long id;
     private String code;
@@ -20,58 +21,71 @@ public class Question {
     private String note;
     private boolean mandatory;
     
-    public Question() {
+    public QuestionImpl() {
         this.mandatory = false;
     }
-
+    
+    @Override
     public long getId() {
         return id;
     }
-
+    
+    @Override
     public void setId(long id) {
         this.id = id;
     }
-
+    
+    @Override
     public String getCode() {
         return code;
     }
-
+    
+    @Override
     public void setCode(String code) {
         this.code = code;
     }
-
+    
+    @Override
     public short getPosition() {
         return position;
     }
-
+    
+    @Override
     public void setPosition(short position) {
         this.position = position;
     }
     
+    @Override
     public String getText() {
         return text;
     }
-
+    
+    @Override
     public void setText(String text) {
         this.text = text;
     }
-
+    
+    @Override
     public String getNote() {
         return note;
     }
-
+    
+    @Override
     public void setNote(String note) {
         this.note = note;
     }
-
+    
+    @Override
     public boolean isMandatory() {
         return mandatory;
     }
-
+    
+    @Override
     public void setMandatory(boolean mandatory) {
         this.mandatory = mandatory;
     }
     
+    @Override
     public String getQuestionType(){
         return null;
     }

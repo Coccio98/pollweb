@@ -8,10 +8,9 @@ package it.univaq.f4i.iw.pollweb.data.dao;
 import it.univaq.f4i.iw.framework.data.DAO;
 import it.univaq.f4i.iw.framework.data.DataException;
 import it.univaq.f4i.iw.framework.data.DataLayer;
-import it.univaq.f4i.iw.pollweb.business.model.ReservedSurvey;
-import it.univaq.f4i.iw.pollweb.business.model.User;
-import it.univaq.f4i.iw.pollweb.business.model.Survey;
-import it.univaq.f4i.iw.pollweb.data.dao.SurveyDAO;
+import it.univaq.f4i.iw.pollweb.data.model.ReservedSurvey;
+import it.univaq.f4i.iw.pollweb.data.model.User;
+import it.univaq.f4i.iw.pollweb.data.model.Survey;
 import it.univaq.f4i.iw.pollweb.data.proxy.ReservedSurveyProxy;
 import it.univaq.f4i.iw.pollweb.data.proxy.SurveyProxy;
 import java.sql.PreparedStatement;
@@ -25,13 +24,13 @@ import java.util.List;
  *
  * @author andrea
  */
-public class SurveyDAOImpl extends DAO implements SurveyDAO {
+public class SurveyDAO_MySQL extends DAO implements SurveyDAO {
 
-    private PreparedStatement sSurveyByID,sSurveyByIDOpen, sSurveys;
+    private PreparedStatement sSurveyByID,sSurveyByIDOpen;
     private PreparedStatement sSurveysByType, sSurveysByManager;
     private PreparedStatement iSurvey, uSurvey, dSurvey;
     
-    public SurveyDAOImpl(DataLayer d) {
+    public SurveyDAO_MySQL(DataLayer d) {
         super(d);
     }
 
@@ -39,7 +38,6 @@ public class SurveyDAOImpl extends DAO implements SurveyDAO {
     public void init() throws DataException {
         try {
             super.init();
-            this.sSurveys = this.connection.prepareStatement("SELECT * FROM surveys");
             this.sSurveyByID = this.connection.prepareStatement("SELECT * FROM surveys WHERE id=?");
             this.sSurveyByIDOpen = this.connection.prepareStatement("SELECT * FROM surveys WHERE id=? AND open=1");
             this.sSurveysByManager = this.connection.prepareStatement("SELECT * FROM surveys "
@@ -62,7 +60,6 @@ public class SurveyDAOImpl extends DAO implements SurveyDAO {
         try {
             sSurveyByID.close();
             sSurveysByType.close();
-            sSurveys.close();
             sSurveysByManager.close();
             iSurvey.close();
             uSurvey.close();
@@ -86,7 +83,7 @@ public class SurveyDAOImpl extends DAO implements SurveyDAO {
     public Survey createSurvey(ResultSet rs) throws DataException {
         try {
             if (! rs.getBoolean("reserved")) {
-                SurveyProxy s = new SurveyProxy(this.dataLayer);
+                SurveyProxy s = createSurvey();
                 s.setId(rs.getLong("id"));
                 s.setTitle(rs.getString("title"));
                 s.setOpeningText(rs.getString("opening_text"));
@@ -96,7 +93,7 @@ public class SurveyDAOImpl extends DAO implements SurveyDAO {
                 s.setDirty(false);
                 return s;
             } else {
-                ReservedSurveyProxy s = new ReservedSurveyProxy(this.dataLayer);
+                ReservedSurveyProxy s = createReservedSurvey();
                 s.setId(rs.getLong("id"));
                 s.setTitle(rs.getString("title"));
                 s.setOpeningText(rs.getString("opening_text"));
@@ -156,28 +153,6 @@ public class SurveyDAOImpl extends DAO implements SurveyDAO {
     }
 
     @Override
-    public List<Survey> findAll() throws DataException {
-        List<Survey> surveys = new ArrayList<>();
-        ResultSet rs = null;
-        try {
-            rs = sSurveys.executeQuery();
-            while (rs.next()) {
-                Survey survey = createSurvey(rs);
-                surveys.add(survey);
-            }
-        } catch (SQLException ex) {
-            throw new DataException("Unable to load surveys", ex);
-        } finally {
-            try {
-                rs.close();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        }
-        return surveys;
-    }
-
-    @Override
     public List<Survey> findByManager(User manager) throws DataException {
         List<Survey> surveys = new ArrayList<>();
         ResultSet rs = null;
@@ -232,7 +207,7 @@ public class SurveyDAOImpl extends DAO implements SurveyDAO {
                 iSurvey.setString(2, survey.getOpeningText());
                 iSurvey.setString(3, survey.getClosingText());
                 iSurvey.setString(4, "0");
-                if(survey instanceof ReservedSurvey){
+                if(survey.isReserved()){
                     iSurvey.setString(5, "1");
                 } else {
                     iSurvey.setString(5, "0");
@@ -258,7 +233,7 @@ public class SurveyDAOImpl extends DAO implements SurveyDAO {
                 } else {
                     uSurvey.setString(4, "0");
                 }
-                if(survey instanceof ReservedSurvey){
+                if(survey.isReserved()){
                     uSurvey.setString(5, "1");
                 } else {
                     uSurvey.setString(5, "0");

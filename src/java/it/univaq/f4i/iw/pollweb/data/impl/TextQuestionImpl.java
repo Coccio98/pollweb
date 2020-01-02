@@ -3,20 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.univaq.f4i.iw.pollweb.business.model;
+package it.univaq.f4i.iw.pollweb.data.impl;
 
 /**
  *
  * @author andrea
  */
-public class TextQuestion extends Question {
+public class TextQuestionImpl extends QuestionImpl {
    
     public static final short UNCOSTRAINED = 0;
     
     private int minLength;
     private int maxLength;
     
-    public TextQuestion() {
+    public TextQuestionImpl() {
         this.minLength = UNCOSTRAINED;
         this.maxLength = 10000;
     }

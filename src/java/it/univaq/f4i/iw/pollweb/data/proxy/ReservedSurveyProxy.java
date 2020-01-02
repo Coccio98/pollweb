@@ -7,11 +7,11 @@ package it.univaq.f4i.iw.pollweb.data.proxy;
 
 import it.univaq.f4i.iw.framework.data.DataException;
 import it.univaq.f4i.iw.framework.data.DataLayer;
-import it.univaq.f4i.iw.pollweb.business.model.Participant;
-import it.univaq.f4i.iw.pollweb.business.model.Question;
-import it.univaq.f4i.iw.pollweb.business.model.User;
-import it.univaq.f4i.iw.pollweb.business.model.ReservedSurvey;
-import it.univaq.f4i.iw.pollweb.business.model.SurveyResponse;
+import it.univaq.f4i.iw.pollweb.data.impl.ParticipantImpl;
+import it.univaq.f4i.iw.pollweb.data.model.Question;
+import it.univaq.f4i.iw.pollweb.data.model.User;
+import it.univaq.f4i.iw.pollweb.data.impl.ReservedSurveyImpl;
+import it.univaq.f4i.iw.pollweb.data.model.SurveyResponse;
 import it.univaq.f4i.iw.pollweb.data.dao.ParticipantDAO;
 import it.univaq.f4i.iw.pollweb.data.dao.QuestionDAO;
 import it.univaq.f4i.iw.pollweb.data.dao.SurveyResponseDAO;
@@ -25,7 +25,7 @@ import java.util.logging.Logger;
  *
  * @author andrea
  */
-public class ReservedSurveyProxy extends ReservedSurvey {
+public class ReservedSurveyProxy extends ReservedSurveyImpl {
     private DataLayer dataLayer;
     private boolean dirty;
     private long managerId;
@@ -58,16 +58,16 @@ public class ReservedSurveyProxy extends ReservedSurvey {
     }
 
     @Override
-    public void setParticipants(List<Participant> participants) {
+    public void setParticipants(List<ParticipantImpl> participants) {
         super.setParticipants(participants);
         setDirty(true);
     }
 
     @Override
-    public List<Participant> getParticipants() {
+    public List<ParticipantImpl> getParticipants() {
         if (super.getParticipants() == null) {
             try {
-                super.setParticipants(((ParticipantDAO) this.dataLayer.getDAO(Participant.class)).findBySurvey(this));
+                super.setParticipants(((ParticipantDAO) this.dataLayer.getDAO(ParticipantImpl.class)).findBySurvey(this));
             } catch (DataException ex) {
                 Logger.getLogger(ReservedSurveyProxy.class.getName()).log(Level.SEVERE, null, ex);
             }

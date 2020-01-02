@@ -3,25 +3,25 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.univaq.f4i.iw.pollweb.business.model;
+package it.univaq.f4i.iw.pollweb.data.impl;
 
 /**
  *
  * @author andrea
  */
-public class Option {
+public class OptionImpl {
     
     private long id;
     private short position;
     private String text;
     
-    public Option() {
+    public OptionImpl() {
         id = 0;
         position = 0;
         text = "";
     }
     
-    public Option(String t) {
+    public OptionImpl(String t) {
         this.text = t;
     }
 

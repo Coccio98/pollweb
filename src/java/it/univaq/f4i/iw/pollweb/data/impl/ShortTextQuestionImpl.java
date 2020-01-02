@@ -3,19 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.univaq.f4i.iw.pollweb.business.model;
+package it.univaq.f4i.iw.pollweb.data.impl;
 
 /**
  *
  * @author andrea
  */
-public class ShortTextQuestion extends TextQuestion {
+public class ShortTextQuestionImpl extends TextQuestionImpl {
     
     public static final String UNCOSTRAINED = ".";
     
     private String pattern;
 
-    public ShortTextQuestion() {
+    public ShortTextQuestionImpl() {
         this.pattern = UNCOSTRAINED;
     }
     

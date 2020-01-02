@@ -6,8 +6,9 @@
 package it.univaq.f4i.iw.pollweb.data.dao;
 
 import it.univaq.f4i.iw.framework.data.DataException;
-import it.univaq.f4i.iw.pollweb.business.model.SurveyResponse;
-import it.univaq.f4i.iw.pollweb.business.model.Survey;
+import it.univaq.f4i.iw.pollweb.data.model.SurveyResponse;
+import it.univaq.f4i.iw.pollweb.data.model.Survey;
+import it.univaq.f4i.iw.pollweb.data.proxy.SurveyResponseProxy;
 import java.util.List;
 
 /**
@@ -16,8 +17,8 @@ import java.util.List;
  */
 public interface SurveyResponseDAO {
     
+    SurveyResponseProxy createSurveyResponse();
     SurveyResponse findById(long id) throws DataException;
     List<SurveyResponse> findBySurvey(Survey survey) throws DataException;
     void saveOrUpdate(SurveyResponse sr, long surveyId) throws DataException;
-    void delete(SurveyResponse sr) throws DataException;
 }

@@ -6,7 +6,8 @@
 package it.univaq.f4i.iw.pollweb.data.dao;
 
 import it.univaq.f4i.iw.framework.data.DataException;
-import it.univaq.f4i.iw.pollweb.business.model.User;
+import it.univaq.f4i.iw.pollweb.data.model.User;
+import it.univaq.f4i.iw.pollweb.data.proxy.UserProxy;
 import java.util.List;
 
 /**
@@ -15,9 +16,9 @@ import java.util.List;
  */
 public interface UserDAO {
     
+    UserProxy createUser();
     List<User> findAll() throws DataException;
     User findById(long id) throws DataException;
-    User findByEmail(String email) throws DataException;
     User findByEmailAndPassword(String email, String password) throws DataException;
     void saveOrUpdate(User user) throws DataException;
     void delete(User user) throws DataException;

@@ -3,30 +3,33 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.univaq.f4i.iw.pollweb.business.model;
+package it.univaq.f4i.iw.pollweb.data.impl;
 
+import it.univaq.f4i.iw.pollweb.data.model.DateAnswer;
 import java.time.LocalDate;
 
 /**
  *
  * @author andrea
  */
-public class DateAnswer extends Answer {
+public class DateAnswerImpl extends AnswerImpl implements DateAnswer{
     
     private LocalDate answer;
-
+    
+    @Override
     public LocalDate getAnswer() {
         return answer;
     }
-
+    
+    @Override
     public void setAnswer(LocalDate answer) {
         this.answer = answer;
     }
     
     @Override
     public boolean isValid(){ 
-        if(this.getQuestion()!= null && (this.getQuestion() instanceof DateQuestion)){
-            DateQuestion question =(DateQuestion) this.getQuestion();
+        if(this.getQuestion()!= null && (this.getQuestion() instanceof DateQuestionImpl)){
+            DateQuestionImpl question =(DateQuestionImpl) this.getQuestion();
         
             if((question.getMaxDate()!= question.UNCOSTRAINED) &&
                     answer.isAfter(question.getMaxDate())){

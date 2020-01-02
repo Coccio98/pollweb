@@ -3,13 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.univaq.f4i.iw.pollweb.business.model;
+package it.univaq.f4i.iw.pollweb.data.impl;
+
+import it.univaq.f4i.iw.pollweb.data.model.TextAnswer;
 
 /**
  *
  * @author andrea
  */
-public class TextAnswer extends Answer {
+public class TextAnswerImpl extends AnswerImpl implements TextAnswer{
     
     private String answer;
 
@@ -23,8 +25,8 @@ public class TextAnswer extends Answer {
     
     @Override
     public boolean isValid(){ 
-        if(this.getQuestion() instanceof TextQuestion && this.getQuestion()!=null){
-            TextQuestion question =(TextQuestion) this.getQuestion();
+        if(this.getQuestion() instanceof TextQuestionImpl && this.getQuestion()!=null){
+            TextQuestionImpl question =(TextQuestionImpl) this.getQuestion();
         
             if((question.getMaxLength()!= question.UNCOSTRAINED) && (
                     answer.length()>question.getMaxLength())){

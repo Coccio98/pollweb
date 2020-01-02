@@ -8,17 +8,14 @@ package it.univaq.f4i.iw.pollweb.data.dao;
 import it.univaq.f4i.iw.framework.data.DAO;
 import it.univaq.f4i.iw.framework.data.DataException;
 import it.univaq.f4i.iw.framework.data.DataLayer;
-import it.univaq.f4i.iw.pollweb.business.model.ChoiceQuestion;
-import it.univaq.f4i.iw.pollweb.business.model.DateQuestion;
-import it.univaq.f4i.iw.pollweb.business.model.NumberQuestion;
-import it.univaq.f4i.iw.pollweb.business.model.Option;
-import it.univaq.f4i.iw.pollweb.business.model.Question;
-import it.univaq.f4i.iw.pollweb.business.model.Survey;
-import it.univaq.f4i.iw.pollweb.business.model.TextQuestion;
-import it.univaq.f4i.iw.pollweb.business.model.ShortTextQuestion;
-import it.univaq.f4i.iw.pollweb.data.dao.QuestionDAO;
-import it.univaq.f4i.iw.pollweb.data.dao.OptionDAO;
-import java.sql.Date;
+import it.univaq.f4i.iw.pollweb.data.impl.ChoiceQuestionImpl;
+import it.univaq.f4i.iw.pollweb.data.impl.DateQuestionImpl;
+import it.univaq.f4i.iw.pollweb.data.impl.NumberQuestionImpl;
+import it.univaq.f4i.iw.pollweb.data.impl.OptionImpl;
+import it.univaq.f4i.iw.pollweb.data.model.Question;
+import it.univaq.f4i.iw.pollweb.data.model.Survey;
+import it.univaq.f4i.iw.pollweb.data.impl.TextQuestionImpl;
+import it.univaq.f4i.iw.pollweb.data.impl.ShortTextQuestionImpl;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,12 +27,12 @@ import java.util.List;
  *
  * @author andrea
  */
-public class QuestionDAOImpl extends DAO implements QuestionDAO {
+public class QuestionDAO_MySQL extends DAO implements QuestionDAO {
     
-    private PreparedStatement sQuestionById, sQuestionsBySurvey;
+    private PreparedStatement sQuestionById, sQuestionsBySurvey,sQuestionByAnswer;
     private PreparedStatement iQuestion,uQuestionCreation, uQuestion, dQuestion;
 
-    public QuestionDAOImpl(DataLayer d) {
+    public QuestionDAO_MySQL(DataLayer d) {
         super(d);
     }
 
@@ -44,6 +41,7 @@ public class QuestionDAOImpl extends DAO implements QuestionDAO {
         try {
             sQuestionById = connection.prepareStatement("SELECT * FROM questions WHERE id=?");
             sQuestionsBySurvey = connection.prepareStatement("SELECT * FROM questions WHERE id_survey=? ORDER BY questions.position");
+            sQuestionByAnswer = connection.prepareStatement("SELECT q.* FROM pollweb.answers AS a JOIN pollweb.questions AS q WHERE a.id=? && a.id_question = q.id");
             iQuestion = connection.prepareStatement("INSERT INTO questions (text,note,mandatory,type,min_date,max_date,min_value,max_value,reg_expr,id_survey,position,code) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
             uQuestionCreation = connection.prepareStatement("UPDATE questions SET min_date=?,max_date=?,min_value=?,max_value=?,reg_expr=? where id=?");
             uQuestion = connection.prepareStatement("UPDATE questions SET text=?,note=?,mandatory=?,type=?,min_date=?,max_date=?,min_value=?,max_value=?,reg_expr=?,position=?,code=? WHERE id=?");
@@ -91,7 +89,7 @@ public class QuestionDAOImpl extends DAO implements QuestionDAO {
     }
 
     private Question createDateQuestion(ResultSet rs) throws DataException {
-        DateQuestion q = new DateQuestion();
+        DateQuestionImpl q = new DateQuestionImpl();
         try {
             q.setId(rs.getLong("id"));
             q.setPosition(rs.getShort("position"));
@@ -108,7 +106,7 @@ public class QuestionDAOImpl extends DAO implements QuestionDAO {
     }
 
     private Question createChoicheQuestion(ResultSet rs) throws DataException {
-        ChoiceQuestion q = new ChoiceQuestion();
+        ChoiceQuestionImpl q = new ChoiceQuestionImpl();
         try {
             q.setId(rs.getLong("id"));
             q.setPosition(rs.getShort("position"));
@@ -118,7 +116,7 @@ public class QuestionDAOImpl extends DAO implements QuestionDAO {
             q.setMandatory(rs.getBoolean("mandatory"));
             q.setMaxNumberOfChoices((short) rs.getInt("max_value"));
             q.setMinNumberOfChoices((short) rs.getInt("min_value"));
-            for (Option option: ((OptionDAO) dataLayer.getDAO(Option.class)).findByQuestion(q)) {
+            for (OptionImpl option: ((OptionDAO) dataLayer.getDAO(OptionImpl.class)).findByQuestion(q)) {
                q.addOption(option);
             }
         } catch (SQLException ex) {
@@ -128,7 +126,7 @@ public class QuestionDAOImpl extends DAO implements QuestionDAO {
     }
     
     private Question createNumberQuestion(ResultSet rs) throws DataException {
-        NumberQuestion q = new NumberQuestion();
+        NumberQuestionImpl q = new NumberQuestionImpl();
         try {
             q.setId(rs.getLong("id"));
             q.setPosition(rs.getShort("position"));
@@ -145,7 +143,7 @@ public class QuestionDAOImpl extends DAO implements QuestionDAO {
     }
     
     private Question createTextQuestion(ResultSet rs) throws DataException {
-        TextQuestion q = new TextQuestion();
+        TextQuestionImpl q = new TextQuestionImpl();
         try {
             q.setId(rs.getLong("id"));
             q.setPosition(rs.getShort("position"));
@@ -162,7 +160,7 @@ public class QuestionDAOImpl extends DAO implements QuestionDAO {
     }
     
     private Question createShortTextQuestion(ResultSet rs) throws DataException {
-        ShortTextQuestion q = new ShortTextQuestion();
+        ShortTextQuestionImpl q = new ShortTextQuestionImpl();
         try {
             q.setId(rs.getLong("id"));
             q.setPosition(rs.getShort("position"));
@@ -185,6 +183,28 @@ public class QuestionDAOImpl extends DAO implements QuestionDAO {
         try {
             sQuestionById.setLong(1, id);
             rs = sQuestionById.executeQuery();
+            if(rs.next()) {
+                return createQuestion(rs);
+            } else {
+                throw new DataException("The question doesn't exist.");
+            } 
+        } catch (SQLException ex) {
+            throw new DataException("Unable to load question by id", ex);
+        } finally {
+            try {
+                rs.close();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+    
+    @Override
+    public Question findByAnswer(long id) throws DataException {
+        ResultSet rs = null;
+        try {
+            sQuestionByAnswer.setLong(1, id);
+            rs = sQuestionByAnswer.executeQuery();
             if(rs.next()) {
                 return createQuestion(rs);
             } else {
@@ -268,24 +288,24 @@ public class QuestionDAOImpl extends DAO implements QuestionDAO {
                 uQuestionCreation.setInt(4, 0);
                 uQuestionCreation.setString(5, ".");
                 uQuestionCreation.setLong(6, question.getId());               
-                if(question instanceof TextQuestion){
-                    if(question instanceof ShortTextQuestion){
-                        uQuestionCreation.setString(5,((ShortTextQuestion) question).getPattern());
+                if(question instanceof TextQuestionImpl){
+                    if(question instanceof ShortTextQuestionImpl){
+                        uQuestionCreation.setString(5,((ShortTextQuestionImpl) question).getPattern());
                     }
-                    uQuestionCreation.setInt(3,((TextQuestion) question).getMinLength());  
-                    uQuestionCreation.setInt(4,((TextQuestion) question).getMaxLength());
+                    uQuestionCreation.setInt(3,((TextQuestionImpl) question).getMinLength());  
+                    uQuestionCreation.setInt(4,((TextQuestionImpl) question).getMaxLength());
                 } else
-                if(question instanceof NumberQuestion){ 
-                    uQuestionCreation.setInt(3,((NumberQuestion) question).getMinValue());  
-                    uQuestionCreation.setInt(4,((NumberQuestion) question).getMaxValue());
+                if(question instanceof NumberQuestionImpl){ 
+                    uQuestionCreation.setInt(3,((NumberQuestionImpl) question).getMinValue());  
+                    uQuestionCreation.setInt(4,((NumberQuestionImpl) question).getMaxValue());
                 } else
-                if(question instanceof DateQuestion){                    
-                    uQuestionCreation.setString(1,(((DateQuestion) question).getMinDate()).toString());  
-                    uQuestionCreation.setString(2,(((DateQuestion) question).getMaxDate()).toString());
+                if(question instanceof DateQuestionImpl){                    
+                    uQuestionCreation.setString(1,(((DateQuestionImpl) question).getMinDate()).toString());  
+                    uQuestionCreation.setString(2,(((DateQuestionImpl) question).getMaxDate()).toString());
                 } else
-                if(question instanceof ChoiceQuestion){
-                    uQuestionCreation.setInt(3, ((ChoiceQuestion) question).getMinNumberOfChoices());
-                    uQuestionCreation.setInt(4,((ChoiceQuestion) question).getMaxNumberOfChoices());
+                if(question instanceof ChoiceQuestionImpl){
+                    uQuestionCreation.setInt(3, ((ChoiceQuestionImpl) question).getMinNumberOfChoices());
+                    uQuestionCreation.setInt(4,((ChoiceQuestionImpl) question).getMaxNumberOfChoices());
                 }
                 if (uQuestionCreation.executeUpdate() == 0) {
                     System.out.println(uQuestionCreation.toString());
@@ -317,24 +337,24 @@ public class QuestionDAOImpl extends DAO implements QuestionDAO {
             uQuestion.setLong(12, question.getId());
             String code = Long.toString(surveyId) + question.getQuestionType().charAt(0) +","+question.getId()+"," + question.getPosition();
             uQuestion.setString(11, code);
-            if(question instanceof TextQuestion){
-                if(question instanceof ShortTextQuestion){
-                    uQuestion.setString(9,((ShortTextQuestion) question).getPattern());
+            if(question instanceof TextQuestionImpl){
+                if(question instanceof ShortTextQuestionImpl){
+                    uQuestion.setString(9,((ShortTextQuestionImpl) question).getPattern());
                 }
-                uQuestion.setInt(7,((TextQuestion) question).getMinLength());  
-                uQuestion.setInt(8,((TextQuestion) question).getMaxLength());
+                uQuestion.setInt(7,((TextQuestionImpl) question).getMinLength());  
+                uQuestion.setInt(8,((TextQuestionImpl) question).getMaxLength());
             } else
-            if(question instanceof NumberQuestion){
-                uQuestion.setInt(7,((NumberQuestion) question).getMinValue());  
-                uQuestion.setInt(8,((NumberQuestion) question).getMaxValue());
+            if(question instanceof NumberQuestionImpl){
+                uQuestion.setInt(7,((NumberQuestionImpl) question).getMinValue());  
+                uQuestion.setInt(8,((NumberQuestionImpl) question).getMaxValue());
             } else
-            if(question instanceof DateQuestion){
-                uQuestion.setString(5,(((DateQuestion) question).getMinDate()).toString());  
-                uQuestion.setString(6,(((DateQuestion) question).getMaxDate()).toString());
+            if(question instanceof DateQuestionImpl){
+                uQuestion.setString(5,(((DateQuestionImpl) question).getMinDate()).toString());  
+                uQuestion.setString(6,(((DateQuestionImpl) question).getMaxDate()).toString());
             } else
-            if(question instanceof ChoiceQuestion){
-                uQuestion.setInt(7, ((ChoiceQuestion) question).getMinNumberOfChoices());
-                uQuestion.setInt(8,((ChoiceQuestion) question).getMaxNumberOfChoices());
+            if(question instanceof ChoiceQuestionImpl){
+                uQuestion.setInt(7, ((ChoiceQuestionImpl) question).getMinNumberOfChoices());
+                uQuestion.setInt(8,((ChoiceQuestionImpl) question).getMaxNumberOfChoices());
             }
             if (uQuestion.executeUpdate() == 0) {
                 System.out.println(uQuestion.toString());
@@ -352,8 +372,8 @@ public class QuestionDAOImpl extends DAO implements QuestionDAO {
                 questions.get(i).setPosition((short)(i-1));
                 update(questions.get(i),survey.getId());
             }
-            if(questions.get(del) instanceof ChoiceQuestion){
-                ((OptionDAO) dataLayer.getDAO(Option.class)).deleteByQuestion(questions.get(del).getId());
+            if(questions.get(del) instanceof ChoiceQuestionImpl){
+                ((OptionDAO) dataLayer.getDAO(OptionImpl.class)).deleteByQuestion(questions.get(del).getId());
             }
             dQuestion.setLong(1, questions.get(del).getId());
             dQuestion.execute();

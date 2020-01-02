@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.univaq.f4i.iw.pollweb.business.model;
+package it.univaq.f4i.iw.pollweb.data.impl;
 
 /**
  *
  * @author andrea
  */
-public class NumberQuestion extends Question {
+public class NumberQuestionImpl extends QuestionImpl {
     
     public static final int UNCOSTRAINED = Integer.MIN_VALUE;
     

@@ -3,14 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.univaq.f4i.iw.pollweb.business.controller;
+package it.univaq.f4i.iw.pollweb.controller;
 
 import it.univaq.f4i.iw.framework.data.DataLayer;
 import it.univaq.f4i.iw.framework.result.FailureResult;
 import it.univaq.f4i.iw.framework.result.TemplateManagerException;
 import it.univaq.f4i.iw.framework.result.TemplateResult;
 import it.univaq.f4i.iw.framework.security.SecurityLayer;
-import it.univaq.f4i.iw.pollweb.business.model.User;
+import it.univaq.f4i.iw.pollweb.data.dao.Pollweb_DataLayer;
+import it.univaq.f4i.iw.pollweb.data.model.User;
 import it.univaq.f4i.iw.pollweb.data.dao.UserDAO;
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -42,7 +43,7 @@ public class NewUserController extends PollWebBaseController {
     private void action_default(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException, TemplateManagerException {
         try {
             TemplateResult res = new TemplateResult(getServletContext());
-            request.setAttribute("users", ((UserDAO) ((DataLayer) request.getAttribute("datalayer")).getDAO(User.class)).findAll());
+            request.setAttribute("users", (((Pollweb_DataLayer) request.getAttribute("datalayer")).getUserDAO()).findAll());
             request.setAttribute("page_title", "Add New User");
             res.activate("new_user.ftl.html", request, response);
         } catch (Exception ex) {
@@ -53,7 +54,7 @@ public class NewUserController extends PollWebBaseController {
     
     private void add_user(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException, TemplateManagerException {
         try {
-            User user = new User();
+            User user = (((Pollweb_DataLayer) request.getAttribute("datalayer")).getUserDAO()).createUser();
             if(request.getParameter("name")!= null && !request.getParameter("name").isEmpty() &&
                     request.getParameter("surname")!= null && !request.getParameter("surname").isEmpty() &&
                     request.getParameter("email")!= null && !request.getParameter("email").isEmpty() &&
@@ -62,7 +63,7 @@ public class NewUserController extends PollWebBaseController {
                 user.setSurname(request.getParameter("surname"));
                 user.setEmail(request.getParameter("email"));
                 user.setPassword(request.getParameter("password"));
-                ((UserDAO) ((DataLayer) request.getAttribute("datalayer")).getDAO(User.class)).saveOrUpdate(user);
+                (((Pollweb_DataLayer) request.getAttribute("datalayer")).getUserDAO()).saveOrUpdate(user);
             } else {
                 request.setAttribute("error", "Fill all the fields!");
             }           

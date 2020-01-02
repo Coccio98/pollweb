@@ -3,25 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.univaq.f4i.iw.pollweb.business.controller;
+package it.univaq.f4i.iw.pollweb.controller;
 
-import it.univaq.f4i.iw.framework.data.DataException;
-import it.univaq.f4i.iw.framework.data.DataLayer;
 import it.univaq.f4i.iw.framework.result.FailureResult;
 import it.univaq.f4i.iw.framework.result.TemplateManagerException;
 import it.univaq.f4i.iw.framework.result.TemplateResult;
 import it.univaq.f4i.iw.framework.security.SecurityLayer;
-import it.univaq.f4i.iw.pollweb.business.model.Survey;
-import it.univaq.f4i.iw.pollweb.business.model.User;
-import it.univaq.f4i.iw.pollweb.business.model.SurveyResponse;
-import it.univaq.f4i.iw.pollweb.data.dao.SurveyDAO;
+import it.univaq.f4i.iw.pollweb.data.dao.Pollweb_DataLayer;
+import it.univaq.f4i.iw.pollweb.data.model.User;
 import it.univaq.f4i.iw.pollweb.data.dao.UserDAO;
-
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,7 +36,7 @@ public class LoginController extends PollWebBaseController {
         String password = request.getParameter("password");
         if (email != null && password != null) {
             try{
-                UserDAO dao = (UserDAO) ((DataLayer) request.getAttribute("datalayer")).getDAO(User.class);
+                UserDAO dao = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getUserDAO();
                 User user = dao.findByEmailAndPassword(email,password);
                 if (user != null) {
                     SecurityLayer.createSession(request, email, user.getId(), user.getType());

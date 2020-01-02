@@ -7,10 +7,10 @@ package it.univaq.f4i.iw.pollweb.data.proxy;
 
 import it.univaq.f4i.iw.framework.data.DataException;
 import it.univaq.f4i.iw.framework.data.DataLayer;
-import it.univaq.f4i.iw.pollweb.business.model.Question;
-import it.univaq.f4i.iw.pollweb.business.model.User;
-import it.univaq.f4i.iw.pollweb.business.model.Survey;
-import it.univaq.f4i.iw.pollweb.business.model.SurveyResponse;
+import it.univaq.f4i.iw.pollweb.data.model.Question;
+import it.univaq.f4i.iw.pollweb.data.model.User;
+import it.univaq.f4i.iw.pollweb.data.impl.SurveyImpl;
+import it.univaq.f4i.iw.pollweb.data.model.SurveyResponse;
 import it.univaq.f4i.iw.pollweb.data.dao.QuestionDAO;
 import it.univaq.f4i.iw.pollweb.data.dao.SurveyResponseDAO;
 import it.univaq.f4i.iw.pollweb.data.dao.UserDAO;
@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  *
  * @author andrea
  */
-public class SurveyProxy extends Survey {
+public class SurveyProxy extends SurveyImpl {
     
     private DataLayer dataLayer;
     private boolean dirty;

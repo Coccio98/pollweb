@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.univaq.f4i.iw.pollweb.business.controller;
+package it.univaq.f4i.iw.pollweb.controller;
 
 import it.univaq.f4i.iw.framework.data.DataException;
 import it.univaq.f4i.iw.framework.data.DataLayer;
@@ -11,22 +11,22 @@ import it.univaq.f4i.iw.framework.result.FailureResult;
 import it.univaq.f4i.iw.framework.result.TemplateManagerException;
 import it.univaq.f4i.iw.framework.result.TemplateResult;
 import it.univaq.f4i.iw.framework.security.SecurityLayer;
-import it.univaq.f4i.iw.pollweb.business.model.Survey;
-import it.univaq.f4i.iw.pollweb.business.model.SurveyResponse;
-import it.univaq.f4i.iw.pollweb.business.model.Answer;
-import it.univaq.f4i.iw.pollweb.business.model.ChoiceAnswer;
-import it.univaq.f4i.iw.pollweb.business.model.ChoiceQuestion;
-import it.univaq.f4i.iw.pollweb.business.model.DateAnswer;
-import it.univaq.f4i.iw.pollweb.business.model.DateQuestion;
-import it.univaq.f4i.iw.pollweb.business.model.NumberAnswer;
-import it.univaq.f4i.iw.pollweb.business.model.NumberQuestion;
-import it.univaq.f4i.iw.pollweb.business.model.Participant;
-import it.univaq.f4i.iw.pollweb.business.model.Question;
-import it.univaq.f4i.iw.pollweb.business.model.ReservedSurvey;
-import it.univaq.f4i.iw.pollweb.business.model.ShortTextAnswer;
-import it.univaq.f4i.iw.pollweb.business.model.ShortTextQuestion;
-import it.univaq.f4i.iw.pollweb.business.model.TextAnswer;
-import it.univaq.f4i.iw.pollweb.business.model.TextQuestion;
+import it.univaq.f4i.iw.pollweb.data.model.Survey;
+import it.univaq.f4i.iw.pollweb.data.model.SurveyResponse;
+import it.univaq.f4i.iw.pollweb.data.model.Answer;
+import it.univaq.f4i.iw.pollweb.data.model.ChoiceAnswer;
+import it.univaq.f4i.iw.pollweb.data.impl.ChoiceQuestionImpl;
+import it.univaq.f4i.iw.pollweb.data.model.DateAnswer;
+import it.univaq.f4i.iw.pollweb.data.impl.DateQuestionImpl;
+import it.univaq.f4i.iw.pollweb.data.model.NumberAnswer;
+import it.univaq.f4i.iw.pollweb.data.impl.NumberQuestionImpl;
+import it.univaq.f4i.iw.pollweb.data.impl.ParticipantImpl;
+import it.univaq.f4i.iw.pollweb.data.model.Question;
+import it.univaq.f4i.iw.pollweb.data.model.ReservedSurvey;
+import it.univaq.f4i.iw.pollweb.data.model.ShortTextAnswer;
+import it.univaq.f4i.iw.pollweb.data.impl.ShortTextQuestionImpl;
+import it.univaq.f4i.iw.pollweb.data.model.TextAnswer;
+import it.univaq.f4i.iw.pollweb.data.impl.TextQuestionImpl;
 import it.univaq.f4i.iw.pollweb.data.dao.ParticipantDAO;
 import it.univaq.f4i.iw.pollweb.data.dao.SurveyDAO;
 import it.univaq.f4i.iw.pollweb.data.dao.SurveyResponseDAO;
@@ -65,7 +65,7 @@ public class SurveyController extends PollWebBaseController {
         try {
             TemplateResult res = new TemplateResult(getServletContext());
             request.setAttribute("page_title", "Surveys");
-            request.setAttribute("surveys", ((SurveyDAO) ((DataLayer) request.getAttribute("datalayer")).getDAO(Survey.class)).findAllNotReserved());
+            request.setAttribute("surveys", (((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyDAO()).findAllNotReserved());
             res.activate("surveys.ftl.html", request, response);
         } catch (Exception ex) {
             request.setAttribute("message", "Data access exception: " + ex.getMessage());
@@ -75,7 +75,7 @@ public class SurveyController extends PollWebBaseController {
     
     private void action_survey(HttpServletRequest request, HttpServletResponse response, int n) throws IOException, ServletException, TemplateManagerException {
         try {
-            SurveyDAO dao = (SurveyDAO) ((DataLayer) request.getAttribute("datalayer")).getDAO(Survey.class);
+            SurveyDAO dao = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyDAO();
             Survey survey = dao.findByIdOpen(n);
             if (survey != null) {
                 TemplateResult res = new TemplateResult(getServletContext());
@@ -107,13 +107,13 @@ public class SurveyController extends PollWebBaseController {
     }
     
     private void action_send_survey (HttpServletRequest request, HttpServletResponse response, int n) throws IOException, ServletException, TemplateManagerException {
-        SurveyResponse surveyResponse = new SurveyResponse();
+        SurveyResponse surveyResponse = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyResponseDAO().createSurveyResponse();
         List<Answer> answers = new ArrayList<>();
         List<String> error = new ArrayList<>();
         boolean choiceController = true;
         boolean mandatoryController= true;
         try{
-            SurveyDAO dao = (SurveyDAO) ((DataLayer) request.getAttribute("datalayer")).getDAO(Survey.class);
+            SurveyDAO dao = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyDAO();
             Survey survey = dao.findByIdOpen(n);
             surveyResponse.setSurvey(survey);
             
@@ -127,9 +127,9 @@ public class SurveyController extends PollWebBaseController {
                 if (request.getParameter(question.getCode()) != null && (! request.getParameter(question.getCode()).equals("")) ) {
                     String text = request.getParameter(question.getCode());
                     Answer answer = null;
-                    if (question instanceof ChoiceQuestion) {
-                        ChoiceQuestion cq = (ChoiceQuestion) question;
-                        ChoiceAnswer ca = new ChoiceAnswer();
+                    if (question instanceof ChoiceQuestionImpl) {
+                        ChoiceQuestionImpl cq = (ChoiceQuestionImpl) question;
+                        ChoiceAnswer ca = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getAnswerDAO().createChoiceAnswer();
                         for (String s: request.getParameterValues(question.getCode())) {
                                 ca.getOptions().add(cq.getOption(Short.valueOf(s)));
                             }
@@ -138,21 +138,21 @@ public class SurveyController extends PollWebBaseController {
                              choiceController=false;
                             request.setAttribute("error_Number", answers.size());                          
                         }
-                    } else if (question instanceof DateQuestion) {
-                        DateAnswer da = new DateAnswer();
+                    } else if (question instanceof DateQuestionImpl) {
+                        DateAnswer da = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getAnswerDAO().createDateAnswer();
                         da.setAnswer(LocalDate.parse(text));
                         answer = da;
-                    } else if (question instanceof NumberQuestion) {
-                        NumberAnswer na = new NumberAnswer();
+                    } else if (question instanceof NumberQuestionImpl) {
+                        NumberAnswer na = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getAnswerDAO().createNumberAnswer();
                         na.setAnswer(Float.valueOf(text));
                         answer = na;
-                    } else if (question instanceof TextQuestion){
-                        if(question instanceof ShortTextQuestion){
-                            ShortTextAnswer ta = new ShortTextAnswer();
+                    } else if (question instanceof TextQuestionImpl){
+                        if(question instanceof ShortTextQuestionImpl){
+                            ShortTextAnswer ta = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getAnswerDAO().createShortTextAnswer();
                             ta.setAnswer(text);
                             answer = ta;
                         } else {
-                            TextAnswer ta = new TextAnswer();
+                            TextAnswer ta = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getAnswerDAO().createTextAnswer();
                             ta.setAnswer(text);
                             answer = ta;
                         }
@@ -170,13 +170,13 @@ public class SurveyController extends PollWebBaseController {
             if (choiceController){
                 if(mandatoryController){
                     if(surveyResponse.isValid()){
-                    SurveyResponseDAO srdao = (SurveyResponseDAO) ((DataLayer) request.getAttribute("datalayer")).getDAO(SurveyResponse.class);
+                    SurveyResponseDAO srdao = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyResponseDAO();
                     srdao.saveOrUpdate(surveyResponse, n);
                     request.setAttribute("send", "");
                     if(request.getSession().getAttribute("p") != null){
-                        Participant p = (Participant) request.getSession().getAttribute("p");
+                        ParticipantImpl p = (ParticipantImpl) request.getSession().getAttribute("p");
                         p.setSubmitted(true);
-                        ((ParticipantDAO)((DataLayer) request.getAttribute("datalayer")).getDAO(Participant.class)).saveOrUpdate(p,n);
+                        ((ParticipantDAO)((DataLayer) request.getAttribute("datalayer")).getDAO(ParticipantImpl.class)).saveOrUpdate(p,n);
                     }
                     } else{
                         request.setAttribute("message", "Invalid Value");
@@ -201,10 +201,10 @@ public class SurveyController extends PollWebBaseController {
         String password = request.getParameter("password");
         if (email != null && password != null) {
             try{
-                SurveyDAO dao = (SurveyDAO) ((DataLayer) request.getAttribute("datalayer")).getDAO(Survey.class);
+                SurveyDAO dao =((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyDAO();
                 ReservedSurvey survey = (ReservedSurvey)dao.findByIdOpen(n);
                 if (survey != null) {
-                    for(Participant p: survey.getParticipants()){
+                    for(ParticipantImpl p: survey.getParticipants()){
                         if((p.getEmail()).equals(email) && (p.getPassword()).equals(password)){
                             if (p.isSubmitted()){
                                 request.setAttribute("error_autentication", "You have already answered!");

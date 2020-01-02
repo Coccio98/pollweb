@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.univaq.f4i.iw.pollweb.business.model;
+package it.univaq.f4i.iw.pollweb.data.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,15 +12,15 @@ import java.util.List;
  *
  * @author andrea
  */
-public class ChoiceQuestion extends Question {
+public class ChoiceQuestionImpl extends QuestionImpl {
     
     public final static short UNCOSTRAINED = 0;
     
     private short maxNumberOfChoices;
     private short minNumberOfChoices;
-    private List<Option> options = new ArrayList<>();
+    private List<OptionImpl> options = new ArrayList<>();
 
-    public ChoiceQuestion() {
+    public ChoiceQuestionImpl() {
         this.maxNumberOfChoices = UNCOSTRAINED;
         this.minNumberOfChoices = UNCOSTRAINED;
     }
@@ -41,16 +41,16 @@ public class ChoiceQuestion extends Question {
         this.minNumberOfChoices = minNumberOfChoices;
     }
 
-    public List<Option> getOptions() {
+    public List<OptionImpl> getOptions() {
         return options;
     }
 
-    public void setOptions(List<Option> choices) {
+    public void setOptions(List<OptionImpl> choices) {
         this.options = choices;
     }
     
-    public Option getOption(short position) {
-        for (Option o: this.options) {
+    public OptionImpl getOption(short position) {
+        for (OptionImpl o: this.options) {
             if (o.getPosition() == position) {
                 return o;
             }
@@ -58,7 +58,7 @@ public class ChoiceQuestion extends Question {
         return null;
     }
     
-    public void addOption(Option  option) {
+    public void addOption(OptionImpl  option) {
         this.options.add(option);
     }
     

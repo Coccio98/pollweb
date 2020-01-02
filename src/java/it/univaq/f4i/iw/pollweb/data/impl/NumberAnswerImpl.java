@@ -3,28 +3,32 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.univaq.f4i.iw.pollweb.business.model;
+package it.univaq.f4i.iw.pollweb.data.impl;
+
+import it.univaq.f4i.iw.pollweb.data.model.NumberAnswer;
 
 /**
  *
  * @author andrea
  */
-public class NumberAnswer extends Answer {
+public class NumberAnswerImpl extends AnswerImpl implements NumberAnswer {
     
     private float answer;
-
+    
+    @Override
     public float getAnswer() {
         return answer;
     }
-
+    
+    @Override
     public void setAnswer(float answer) {
         this.answer = answer;
     }
     
     @Override
     public boolean isValid(){ 
-        if(this.getQuestion()!= null && (this.getQuestion() instanceof NumberQuestion)){
-            NumberQuestion question =(NumberQuestion) this.getQuestion();
+        if(this.getQuestion()!= null && (this.getQuestion() instanceof NumberQuestionImpl)){
+            NumberQuestionImpl question =(NumberQuestionImpl) this.getQuestion();
         
             if((question.getMaxValue()!= question.UNCOSTRAINED) && (
                     answer > question.getMaxValue())){

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.univaq.f4i.iw.pollweb.business.model;
+package it.univaq.f4i.iw.pollweb.data.impl;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -12,14 +12,14 @@ import java.time.Month;
  *
  * @author andrea
  */
-public class DateQuestion extends Question {
+public class DateQuestionImpl extends QuestionImpl {
     
     public final static LocalDate UNCOSTRAINED = null;
     
     private LocalDate minDate;
     private LocalDate maxDate;
     
-    public DateQuestion(){
+    public DateQuestionImpl(){
         this.minDate=LocalDate.of(1, Month.JANUARY, 1);
         this.maxDate=LocalDate.of(9999, Month.DECEMBER, 31);
     }

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package it.univaq.f4i.iw.pollweb.business.model;
+package it.univaq.f4i.iw.pollweb.data.impl;
 
 import java.util.Objects;
 
@@ -11,15 +11,15 @@ import java.util.Objects;
  *
  * @author andrea
  */
-public class Participant {
+public class ParticipantImpl {
     private long id;
     private String email;
     private String password;
     private String name;
-    private ReservedSurvey reservedSurvey;
+    private ReservedSurveyImpl reservedSurvey;
     private boolean submitted;
     
-    public Participant() {
+    public ParticipantImpl() {
         this.id=0;
         this.submitted = false;
     }
@@ -64,11 +64,11 @@ public class Participant {
         return this.submitted;
     }
 
-    public ReservedSurvey getReservedSurvey() {
+    public ReservedSurveyImpl getReservedSurvey() {
         return reservedSurvey;
     }
 
-    public void setReservedSurvey(ReservedSurvey reservedSurvey) {
+    public void setReservedSurvey(ReservedSurveyImpl reservedSurvey) {
         this.reservedSurvey = reservedSurvey;
     }
 }
