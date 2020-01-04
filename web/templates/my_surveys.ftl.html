@@ -24,9 +24,9 @@
                     </td>
                     <td>
                         <#if survey.isActive()>
-                            <img src="images/eye.svg" alt="eye" title="Disable" class="imgButton eye green" onclick="location.href='my_surveys?d=${survey.getId()}'"/> 
+                            <img src="images/eye.svg" alt="eye" title="Disable" class="imgButton eye green" onclick="location.href='my_surveys?t=${survey.getId()}'"/> 
                         <#else>
-                            <img src="images/eye-closed.svg" alt="eye-close" title="Enable" class="imgButton eye red" onclick="location.href='my_surveys?e=${survey.getId()}'"/> 
+                            <img src="images/eye-closed.svg" alt="eye-close" title="Enable" class="imgButton eye red" onclick="location.href='my_surveys?t=${survey.getId()}'"/> 
                         </#if>
                     </td>
                     <td>                           
