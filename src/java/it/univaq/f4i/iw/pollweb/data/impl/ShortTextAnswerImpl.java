@@ -6,6 +6,7 @@
 package it.univaq.f4i.iw.pollweb.data.impl;
 
 import it.univaq.f4i.iw.pollweb.data.model.ShortTextAnswer;
+import it.univaq.f4i.iw.pollweb.data.model.ShortTextQuestion;
 import java.util.regex.Pattern;
 
 /**
@@ -16,18 +17,18 @@ public class ShortTextAnswerImpl extends TextAnswerImpl implements ShortTextAnsw
 
     @Override
     public boolean isValid() {
-        if(this.getQuestion()!= null && (this.getQuestion() instanceof ShortTextQuestionImpl)){
-            ShortTextQuestionImpl question =(ShortTextQuestionImpl) this.getQuestion();
+        if(this.getQuestion()!= null && (this.getQuestion() instanceof ShortTextQuestion)){
+            ShortTextQuestion question =(ShortTextQuestion) this.getQuestion();
         
-            if((question.getMaxLength()!= TextQuestionImpl.UNCOSTRAINED) && (
+            if((question.getMaxLength()!= 0) && (
                     getAnswer().length() > question.getMaxLength())){
                 return false;       
             }
-            if((question.getMinLength()!= TextQuestionImpl.UNCOSTRAINED) && (
+            if((question.getMinLength()!= 0) && (
                     getAnswer().length() < question.getMinLength())){
                 return false;
             }
-            if (!(question.getPattern().equals(ShortTextQuestionImpl.UNCOSTRAINED)) &&
+            if (!(question.getPattern().equals(".")) &&
                     !(Pattern.matches(question.getPattern(), question.getText()))) {
                 return false;
             }

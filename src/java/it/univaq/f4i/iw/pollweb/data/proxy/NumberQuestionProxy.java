@@ -6,56 +6,68 @@
 package it.univaq.f4i.iw.pollweb.data.proxy;
 
 import it.univaq.f4i.iw.framework.data.DataLayer;
-import it.univaq.f4i.iw.pollweb.data.impl.UserImpl;
+import it.univaq.f4i.iw.pollweb.data.impl.NumberQuestionImpl;
 
 /**
  *
  * @author Pagliarini Alberto
  */
-public class UserProxy extends UserImpl{
+public class NumberQuestionProxy extends NumberQuestionImpl{
     
     private DataLayer dataLayer;
     private boolean dirty;
     
-    public UserProxy(DataLayer dl){
+    public NumberQuestionProxy(DataLayer dataLayer){
         super();
-        this.dataLayer = dl;
+        this.dataLayer = dataLayer;
         this.dirty = false;
     }
-
+    
     @Override
-    public void setId(long id) {
+    public void setId(long id){
         super.setId(id);
         setDirty(true);
     }
     
     @Override
-    public void setName(String name) {
-        super.setName(name);
+    public void setCode(String code){
+        super.setCode(code);
         setDirty(true);
     }
     
     @Override
-    public void setSurname(String surname) {
-        super.setSurname(surname);
+    public void setPosition(short position) {
+        super.setPosition(position);
+        setDirty(true);
+    }
+    
+     @Override
+    public void setText(String text) {
+        super.setText(text);
         setDirty(true);
     }
     
     @Override
-    public void setEmail(String email) {
-        super.setEmail(email);
+    public void setNote(String note) {
+        super.setNote(note);
         setDirty(true);
     }
     
     @Override
-    public void setPassword(String password) {
-        super.setPassword(password);
+    public void setMandatory(boolean mandatory) {
+        super.setMandatory(mandatory);
         setDirty(true);
     }
     
     @Override
-    public void setType(Type type) {
-        super.setType(type);
+    public void setMinValue(int minValue) {
+        super.setMinValue(minValue);
+        setDirty(true);
+    }
+    
+    @Override
+    public void setMaxValue(int maxValue) {
+        super.setMaxValue(maxValue);
         setDirty(true);
     }
     

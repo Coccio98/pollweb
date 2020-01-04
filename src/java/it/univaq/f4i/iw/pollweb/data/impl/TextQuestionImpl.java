@@ -5,11 +5,13 @@
  */
 package it.univaq.f4i.iw.pollweb.data.impl;
 
+import it.univaq.f4i.iw.pollweb.data.model.TextQuestion;
+
 /**
  *
  * @author andrea
  */
-public class TextQuestionImpl extends QuestionImpl {
+public class TextQuestionImpl extends QuestionImpl implements TextQuestion{
    
     public static final short UNCOSTRAINED = 0;
     
@@ -20,19 +22,23 @@ public class TextQuestionImpl extends QuestionImpl {
         this.minLength = UNCOSTRAINED;
         this.maxLength = 10000;
     }
-
+    
+    @Override
     public int getMinLength() {
         return minLength;
     }
-
+    
+    @Override
     public void setMinLength(int minLength) {
         this.minLength = minLength;
     }
-
+    
+    @Override
     public int getMaxLength() {
         return maxLength;
     }
-
+    
+    @Override
     public void setMaxLength(int maxLength) {
         this.maxLength = maxLength;
     }

@@ -6,6 +6,7 @@
 package it.univaq.f4i.iw.pollweb.data.impl;
 
 import it.univaq.f4i.iw.pollweb.data.model.DateAnswer;
+import it.univaq.f4i.iw.pollweb.data.model.DateQuestion;
 import java.time.LocalDate;
 
 /**
@@ -28,14 +29,14 @@ public class DateAnswerImpl extends AnswerImpl implements DateAnswer{
     
     @Override
     public boolean isValid(){ 
-        if(this.getQuestion()!= null && (this.getQuestion() instanceof DateQuestionImpl)){
-            DateQuestionImpl question =(DateQuestionImpl) this.getQuestion();
+        if(this.getQuestion()!= null && (this.getQuestion() instanceof DateQuestion)){
+            DateQuestion question =(DateQuestion) this.getQuestion();
         
-            if((question.getMaxDate()!= question.UNCOSTRAINED) &&
+            if((question.getMaxDate()!= null) &&
                     answer.isAfter(question.getMaxDate())){
                 return false;       
             }
-            if((question.getMinDate()!= question.UNCOSTRAINED) && 
+            if((question.getMinDate()!= null) && 
                     answer.isBefore(question.getMinDate())){
                 return false;
             }

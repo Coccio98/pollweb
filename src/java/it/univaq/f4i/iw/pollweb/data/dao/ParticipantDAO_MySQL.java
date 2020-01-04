@@ -8,8 +8,9 @@ package it.univaq.f4i.iw.pollweb.data.dao;
 import it.univaq.f4i.iw.framework.data.DAO;
 import it.univaq.f4i.iw.framework.data.DataException;
 import it.univaq.f4i.iw.framework.data.DataLayer;
-import it.univaq.f4i.iw.pollweb.data.impl.ParticipantImpl;
+import it.univaq.f4i.iw.pollweb.data.model.Participant;
 import it.univaq.f4i.iw.pollweb.data.model.Survey;
+import it.univaq.f4i.iw.pollweb.data.proxy.ParticipantProxy;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -53,17 +54,20 @@ public class ParticipantDAO_MySQL extends DAO implements ParticipantDAO {
         }
     }
     
-    
+    @Override
+    public ParticipantProxy createParticipant() {
+        return new ParticipantProxy(getDataLayer());
+    }
 
     @Override
-    public List<ParticipantImpl> findBySurvey(Survey survey) throws DataException {
+    public List<Participant> findBySurvey(Survey survey) throws DataException {
         ResultSet rs = null;
-        List<ParticipantImpl> participants = new ArrayList<>();
+        List<Participant> participants = new ArrayList<>();
         try {
             sParticipantsBySurvey.setLong(1, survey.getId());
             rs = sParticipantsBySurvey.executeQuery();
             while (rs.next()) {
-                ParticipantImpl p = new ParticipantImpl();
+                Participant p = createParticipant();
                 p.setId(rs.getLong("id"));
                 p.setEmail(rs.getString("email"));
                 p.setPassword(rs.getString("password"));
@@ -84,7 +88,7 @@ public class ParticipantDAO_MySQL extends DAO implements ParticipantDAO {
     } 
     
     @Override
-    public void saveOrUpdate(ParticipantImpl participant, long surveyId) throws DataException {
+    public void saveOrUpdate(Participant participant, long surveyId) throws DataException {
         if (participant.getId()==0){
             try {
                 iParticipant.setString(1,participant.getName());

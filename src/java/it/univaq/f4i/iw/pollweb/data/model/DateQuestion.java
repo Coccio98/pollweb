@@ -5,19 +5,22 @@
  */
 package it.univaq.f4i.iw.pollweb.data.model;
 
-import java.util.List;
+import java.time.LocalDate;
 
 /**
  *
  * @author Pagliarini Alberto
  */
-public interface ReservedSurvey extends Survey {
+public interface DateQuestion extends Question{
     
-    List<Participant> getParticipants();
-    
-    void setParticipants(List<Participant> participants);
+    LocalDate getMinDate();
+
+    void setMinDate(LocalDate minDate);
+            
+    LocalDate getMaxDate();
+
+    void setMaxDate(LocalDate maxDate);
     
     @Override
-    boolean isReserved();
-    
+    String getQuestionType();    
 }

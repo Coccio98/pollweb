@@ -7,15 +7,12 @@ package it.univaq.f4i.iw.pollweb.data.proxy;
 
 import it.univaq.f4i.iw.framework.data.DataException;
 import it.univaq.f4i.iw.framework.data.DataLayer;
-import it.univaq.f4i.iw.pollweb.data.impl.ParticipantImpl;
+import it.univaq.f4i.iw.pollweb.data.model.Participant;
 import it.univaq.f4i.iw.pollweb.data.model.Question;
 import it.univaq.f4i.iw.pollweb.data.model.User;
 import it.univaq.f4i.iw.pollweb.data.impl.ReservedSurveyImpl;
 import it.univaq.f4i.iw.pollweb.data.model.SurveyResponse;
-import it.univaq.f4i.iw.pollweb.data.dao.ParticipantDAO;
-import it.univaq.f4i.iw.pollweb.data.dao.QuestionDAO;
-import it.univaq.f4i.iw.pollweb.data.dao.SurveyResponseDAO;
-import it.univaq.f4i.iw.pollweb.data.dao.UserDAO;
+import it.univaq.f4i.iw.pollweb.data.dao.Pollweb_DataLayer;
 import java.util.List;
 
 import java.util.logging.Level;
@@ -31,6 +28,7 @@ public class ReservedSurveyProxy extends ReservedSurveyImpl {
     private long managerId;
     
     public ReservedSurveyProxy(DataLayer dl) {
+        super();
         super.setManager(null);
         super.setParticipants(null);
         super.setResponses(null);
@@ -49,7 +47,7 @@ public class ReservedSurveyProxy extends ReservedSurveyImpl {
     public List<SurveyResponse> getResponses() {
         if (super.getResponses() == null) {
             try {
-                super.setResponses(((SurveyResponseDAO) this.dataLayer.getDAO(SurveyResponse.class)).findBySurvey(this));
+                super.setResponses(((Pollweb_DataLayer) this.dataLayer).getSurveyResponseDAO().findBySurvey(this));
             } catch (DataException ex) {
                 Logger.getLogger(ReservedSurveyProxy.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -58,16 +56,16 @@ public class ReservedSurveyProxy extends ReservedSurveyImpl {
     }
 
     @Override
-    public void setParticipants(List<ParticipantImpl> participants) {
+    public void setParticipants(List<Participant> participants) {
         super.setParticipants(participants);
         setDirty(true);
     }
 
     @Override
-    public List<ParticipantImpl> getParticipants() {
+    public List<Participant> getParticipants() {
         if (super.getParticipants() == null) {
             try {
-                super.setParticipants(((ParticipantDAO) this.dataLayer.getDAO(ParticipantImpl.class)).findBySurvey(this));
+                super.setParticipants(((Pollweb_DataLayer) this.dataLayer).getParticipantDAO().findBySurvey(this));
             } catch (DataException ex) {
                 Logger.getLogger(ReservedSurveyProxy.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -93,7 +91,7 @@ public class ReservedSurveyProxy extends ReservedSurveyImpl {
     public User getManager() {
         if (super.getManager() == null) {
             try {
-                super.setManager(((UserDAO) this.dataLayer.getDAO(User.class)).findById(managerId));
+                super.setManager(((Pollweb_DataLayer) this.dataLayer).getUserDAO().findById(managerId));
             } catch (DataException ex) {
                 Logger.getLogger(ReservedSurveyProxy.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -111,7 +109,7 @@ public class ReservedSurveyProxy extends ReservedSurveyImpl {
     public List<Question> getQuestions() {
         if (super.getQuestions() == null || super.getQuestions().size() <= 0) {
             try {
-                super.setQuestions(((QuestionDAO) this.dataLayer.getDAO(Question.class)).findBySurvey(this));
+                super.setQuestions(((Pollweb_DataLayer) this.dataLayer).getQuestionDAO().findBySurvey(this));
             } catch (DataException ex) {
                 Logger.getLogger(ReservedSurveyProxy.class.getName()).log(Level.SEVERE, null, ex);
             }

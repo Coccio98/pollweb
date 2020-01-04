@@ -5,19 +5,20 @@
  */
 package it.univaq.f4i.iw.pollweb.data.model;
 
-import java.util.List;
-
 /**
  *
  * @author Pagliarini Alberto
  */
-public interface ReservedSurvey extends Survey {
+public interface NumberQuestion extends Question{
     
-    List<Participant> getParticipants();
-    
-    void setParticipants(List<Participant> participants);
+    int getMinValue();
+
+    void setMinValue(int minValue);
+
+    int getMaxValue();
+
+    void setMaxValue(int maxValue);
     
     @Override
-    boolean isReserved();
-    
+    String getQuestionType();
 }

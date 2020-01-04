@@ -9,19 +9,26 @@ package it.univaq.f4i.iw.pollweb.data.model;
  *
  * @author Pagliarini Alberto
  */
-public interface Answer {
+public interface Participant {
     
     long getId();
-    
+
     void setId(long id);
 
-    Question getQuestion();
+    String getEmail();
 
-    void setQuestion(Question question);
+    void setEmail(String email);
+
+    String getPassword();
+
+    void setPassword(String password);
     
-    public abstract boolean isValid();
+    String getName();
+
+    void setName(String name);
     
-    @Override
-    public String toString();
+    void setSubmitted(boolean b);
     
+    boolean isSubmitted();
+
 }

@@ -5,19 +5,21 @@
  */
 package it.univaq.f4i.iw.pollweb.data.model;
 
-import java.util.List;
-
 /**
  *
  * @author Pagliarini Alberto
  */
-public interface ReservedSurvey extends Survey {
+public interface Option {
     
-    List<Participant> getParticipants();
+    long getId();
+
+    void setId(long id);
     
-    void setParticipants(List<Participant> participants);
-    
-    @Override
-    boolean isReserved();
-    
+    short getPosition();
+
+    void setPosition(short number);
+
+    String getText();
+
+    void setText(String text);
 }

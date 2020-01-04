@@ -5,11 +5,13 @@
  */
 package it.univaq.f4i.iw.pollweb.data.impl;
 
+import it.univaq.f4i.iw.pollweb.data.model.ShortTextQuestion;
+
 /**
  *
  * @author andrea
  */
-public class ShortTextQuestionImpl extends TextQuestionImpl {
+public class ShortTextQuestionImpl extends TextQuestionImpl implements ShortTextQuestion{
     
     public static final String UNCOSTRAINED = ".";
     
@@ -19,10 +21,12 @@ public class ShortTextQuestionImpl extends TextQuestionImpl {
         this.pattern = UNCOSTRAINED;
     }
     
+    @Override
     public String getPattern() {
         return pattern;
     }
-
+    
+    @Override
     public void setPattern(String pattern) {
         this.pattern = pattern;
     }

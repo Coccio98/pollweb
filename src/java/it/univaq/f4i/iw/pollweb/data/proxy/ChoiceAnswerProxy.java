@@ -7,12 +7,9 @@ package it.univaq.f4i.iw.pollweb.data.proxy;
 
 import it.univaq.f4i.iw.framework.data.DataException;
 import it.univaq.f4i.iw.framework.data.DataLayer;
-import it.univaq.f4i.iw.pollweb.data.dao.AnswerDAO;
-import it.univaq.f4i.iw.pollweb.data.dao.QuestionDAO;
-import it.univaq.f4i.iw.pollweb.data.model.Answer;
+import it.univaq.f4i.iw.pollweb.data.dao.Pollweb_DataLayer;
 import it.univaq.f4i.iw.pollweb.data.impl.ChoiceAnswerImpl;
 import it.univaq.f4i.iw.pollweb.data.model.Question;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,6 +22,7 @@ public class ChoiceAnswerProxy extends ChoiceAnswerImpl{
     private boolean dirty;
     
     public ChoiceAnswerProxy(DataLayer dataLayer) {
+        super();
         super.setQuestion(null);
         this.dataLayer = dataLayer;
         this.dirty = false;
@@ -46,7 +44,7 @@ public class ChoiceAnswerProxy extends ChoiceAnswerImpl{
     public Question getQuestion() {
         if (super.getQuestion() == null) {
             try {
-                super.setQuestion(((QuestionDAO) this.dataLayer.getDAO(Question.class)).findByAnswer(this.getId()));
+                super.setQuestion(((Pollweb_DataLayer) this.dataLayer).getQuestionDAO().findByAnswer(this.getId()));
             } catch (DataException ex) {
                 Logger.getLogger(SurveyResponseProxy.class.getName()).log(Level.SEVERE, null, ex);
             }

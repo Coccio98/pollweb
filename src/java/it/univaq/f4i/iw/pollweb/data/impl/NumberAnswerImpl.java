@@ -6,6 +6,7 @@
 package it.univaq.f4i.iw.pollweb.data.impl;
 
 import it.univaq.f4i.iw.pollweb.data.model.NumberAnswer;
+import it.univaq.f4i.iw.pollweb.data.model.NumberQuestion;
 
 /**
  *
@@ -27,14 +28,14 @@ public class NumberAnswerImpl extends AnswerImpl implements NumberAnswer {
     
     @Override
     public boolean isValid(){ 
-        if(this.getQuestion()!= null && (this.getQuestion() instanceof NumberQuestionImpl)){
-            NumberQuestionImpl question =(NumberQuestionImpl) this.getQuestion();
+        if(this.getQuestion()!= null && (this.getQuestion() instanceof NumberQuestion)){
+            NumberQuestion question =(NumberQuestion) this.getQuestion();
         
-            if((question.getMaxValue()!= question.UNCOSTRAINED) && (
+            if((question.getMaxValue()!= Integer.MIN_VALUE) && (
                     answer > question.getMaxValue())){
                 return false;       
             }
-            if((question.getMinValue()!= question.UNCOSTRAINED) && (
+            if((question.getMinValue()!= Integer.MIN_VALUE) && (
                     answer < question.getMinValue())){
                 return false;
             }

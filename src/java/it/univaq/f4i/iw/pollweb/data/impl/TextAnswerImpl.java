@@ -6,6 +6,7 @@
 package it.univaq.f4i.iw.pollweb.data.impl;
 
 import it.univaq.f4i.iw.pollweb.data.model.TextAnswer;
+import it.univaq.f4i.iw.pollweb.data.model.TextQuestion;
 
 /**
  *
@@ -14,25 +15,27 @@ import it.univaq.f4i.iw.pollweb.data.model.TextAnswer;
 public class TextAnswerImpl extends AnswerImpl implements TextAnswer{
     
     private String answer;
-
+    
+    @Override
     public String getAnswer() {
         return answer;
     }
-
+    
+    @Override
     public void setAnswer(String answer) {
         this.answer = answer;
     }
     
     @Override
     public boolean isValid(){ 
-        if(this.getQuestion() instanceof TextQuestionImpl && this.getQuestion()!=null){
-            TextQuestionImpl question =(TextQuestionImpl) this.getQuestion();
+        if(this.getQuestion() instanceof TextQuestion && this.getQuestion()!=null){
+            TextQuestion question =(TextQuestion) this.getQuestion();
         
-            if((question.getMaxLength()!= question.UNCOSTRAINED) && (
+            if((question.getMaxLength()!= 0) && (
                     answer.length()>question.getMaxLength())){
                 return false;       
             }
-            if((question.getMinLength()!= question.UNCOSTRAINED) && (
+            if((question.getMinLength()!= 0) && (
                     answer.length()<question.getMinLength())){
                 return false;
             }

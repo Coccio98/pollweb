@@ -8,9 +8,10 @@ package it.univaq.f4i.iw.pollweb.data.dao;
 import it.univaq.f4i.iw.framework.data.DAO;
 import it.univaq.f4i.iw.framework.data.DataException;
 import it.univaq.f4i.iw.framework.data.DataLayer;
-import it.univaq.f4i.iw.pollweb.data.impl.ChoiceQuestionImpl;
-import it.univaq.f4i.iw.pollweb.data.impl.OptionImpl;
+import it.univaq.f4i.iw.pollweb.data.model.ChoiceQuestion;
+import it.univaq.f4i.iw.pollweb.data.model.Option;
 import it.univaq.f4i.iw.pollweb.data.model.Question;
+import it.univaq.f4i.iw.pollweb.data.proxy.OptionProxy;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -56,17 +57,20 @@ public class OptionDAO_MySQL extends DAO implements OptionDAO {
         }
     }
     
-    
+    @Override
+    public OptionProxy createOption(){
+        return new OptionProxy(getDataLayer());
+    }
 
     @Override
-    public List<OptionImpl> findByQuestion(Question question) throws DataException {
-        List<OptionImpl> options = new ArrayList<>();
+    public List<Option> findByQuestion(Question question) throws DataException {
+        List<Option> options = new ArrayList<>();
         ResultSet rs = null;
         try {
             sOptionsByQuestion.setLong(1, question.getId());
             rs = sOptionsByQuestion.executeQuery();
             while (rs.next()) {
-                OptionImpl o = new OptionImpl();
+                Option o = createOption();
                 o.setId(rs.getLong("id"));
                 o.setText(rs.getString("text"));
                 o.setPosition(rs.getShort("position"));
@@ -85,7 +89,7 @@ public class OptionDAO_MySQL extends DAO implements OptionDAO {
     }
 
     @Override
-    public void saveOrUpdate(OptionImpl option, long questionId) throws DataException {
+    public void saveOrUpdate(Option option, long questionId) throws DataException {
         //text,position,id_question
         if(option.getId() == 0){
             try{
@@ -113,9 +117,9 @@ public class OptionDAO_MySQL extends DAO implements OptionDAO {
     }
 
     @Override
-    public void delete(ChoiceQuestionImpl question, int del) throws DataException {
+    public void delete(ChoiceQuestion question, int del) throws DataException {
         try {
-            List<OptionImpl> options = question.getOptions();
+            List<Option> options = question.getOptions();
             for(int i=del+1; i < options.size(); i++){
                 options.get(i).setPosition((short)(i-1));
                 saveOrUpdate(options.get(i), question.getId());

@@ -5,7 +5,7 @@
  */
 package it.univaq.f4i.iw.pollweb.data.model;
 
-import it.univaq.f4i.iw.pollweb.data.model.Answer;
+
 import java.time.LocalDate;
 import java.util.List;
 

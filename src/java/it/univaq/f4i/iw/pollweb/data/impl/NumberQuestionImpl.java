@@ -5,29 +5,35 @@
  */
 package it.univaq.f4i.iw.pollweb.data.impl;
 
+import it.univaq.f4i.iw.pollweb.data.model.NumberQuestion;
+
 /**
  *
  * @author andrea
  */
-public class NumberQuestionImpl extends QuestionImpl {
+public class NumberQuestionImpl extends QuestionImpl implements NumberQuestion {
     
     public static final int UNCOSTRAINED = Integer.MIN_VALUE;
     
     private int minValue;
     private int maxValue;
-
+    
+    @Override
     public int getMinValue() {
         return minValue;
     }
-
+    
+    @Override
     public void setMinValue(int minValue) {
         this.minValue = minValue;
     }
-
+    
+    @Override
     public int getMaxValue() {
         return maxValue;
     }
-
+    
+    @Override
     public void setMaxValue(int maxValue) {
         this.maxValue = maxValue;
     }

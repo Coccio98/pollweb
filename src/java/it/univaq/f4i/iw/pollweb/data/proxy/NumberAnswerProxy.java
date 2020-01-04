@@ -7,7 +7,7 @@ package it.univaq.f4i.iw.pollweb.data.proxy;
 
 import it.univaq.f4i.iw.framework.data.DataException;
 import it.univaq.f4i.iw.framework.data.DataLayer;
-import it.univaq.f4i.iw.pollweb.data.dao.QuestionDAO;
+import it.univaq.f4i.iw.pollweb.data.dao.Pollweb_DataLayer;
 import it.univaq.f4i.iw.pollweb.data.impl.NumberAnswerImpl;
 import it.univaq.f4i.iw.pollweb.data.model.Question;
 import java.util.logging.Level;
@@ -23,6 +23,7 @@ public class NumberAnswerProxy extends NumberAnswerImpl {
     private boolean dirty;
     
     public NumberAnswerProxy(DataLayer dataLayer) {
+        super();
         super.setQuestion(null);
         this.dataLayer = dataLayer;
         this.dirty = false;
@@ -44,7 +45,7 @@ public class NumberAnswerProxy extends NumberAnswerImpl {
     public Question getQuestion() {
         if (super.getQuestion() == null) {
             try {
-                super.setQuestion(((QuestionDAO) this.dataLayer.getDAO(Question.class)).findByAnswer(this.getId()));
+                super.setQuestion(((Pollweb_DataLayer) this.dataLayer).getQuestionDAO().findByAnswer(this.getId()));
             } catch (DataException ex) {
                 Logger.getLogger(SurveyResponseProxy.class.getName()).log(Level.SEVERE, null, ex);
             }

@@ -12,7 +12,7 @@ import it.univaq.f4i.iw.pollweb.data.model.Answer;
 import it.univaq.f4i.iw.pollweb.data.model.ChoiceAnswer;
 import it.univaq.f4i.iw.pollweb.data.model.DateAnswer;
 import it.univaq.f4i.iw.pollweb.data.model.NumberAnswer;
-import it.univaq.f4i.iw.pollweb.data.impl.OptionImpl;
+import it.univaq.f4i.iw.pollweb.data.model.Option;
 import it.univaq.f4i.iw.pollweb.data.model.SurveyResponse;
 import it.univaq.f4i.iw.pollweb.data.model.TextAnswer;
 import it.univaq.f4i.iw.pollweb.data.model.ShortTextAnswer;
@@ -121,7 +121,7 @@ public class AnswerDAO_MySQL extends DAO implements AnswerDAO {
                     iAnswer.setString(4, "choice");
                     ChoiceAnswer ca = (ChoiceAnswer) answer;
                     for (int i = 0; i < ca.getOptions().size(); i++) {
-                        OptionImpl o = ca.getOptions().get(i);
+                        Option o = ca.getOptions().get(i);
                         text += o.getPosition() + "-" + o.getText();
                         if (i < ca.getOptions().size() - 1) {
                             text += ";";
@@ -214,7 +214,7 @@ public class AnswerDAO_MySQL extends DAO implements AnswerDAO {
         answer.setId(rs.getLong("a.id"));
         for (String s: rs.getString("a.text").split(";")) {
             String[] t = s.split("-");
-            OptionImpl o = new OptionImpl();
+            Option o = ((Pollweb_DataLayer) this.dataLayer).getOptionDAO().createOption();
             o.setPosition(Short.valueOf(t[0]));
             o.setText(t[1]);
             answer.getOptions().add(o);

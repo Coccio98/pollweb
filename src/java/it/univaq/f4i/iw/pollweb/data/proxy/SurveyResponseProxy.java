@@ -10,8 +10,7 @@ import it.univaq.f4i.iw.framework.data.DataLayer;
 import it.univaq.f4i.iw.pollweb.data.model.Answer;
 import it.univaq.f4i.iw.pollweb.data.model.Survey;
 import it.univaq.f4i.iw.pollweb.data.impl.SurveyResponseImpl;
-import it.univaq.f4i.iw.pollweb.data.dao.AnswerDAO;
-import it.univaq.f4i.iw.pollweb.data.dao.SurveyDAO;
+import it.univaq.f4i.iw.pollweb.data.dao.Pollweb_DataLayer;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.logging.Level;
@@ -27,6 +26,7 @@ public class SurveyResponseProxy extends SurveyResponseImpl {
     private long surveyId;
 
     public SurveyResponseProxy(DataLayer dataLayer) {
+        super();
         super.setAnswers(null);
         super.setSurvey(null);
         this.dataLayer = dataLayer;
@@ -44,7 +44,7 @@ public class SurveyResponseProxy extends SurveyResponseImpl {
     public List<Answer> getAnswers() {
         if (super.getAnswers() == null) {
             try {
-                super.setAnswers(((AnswerDAO) this.dataLayer.getDAO(Answer.class)).findBySurveyResponse(this));
+                super.setAnswers(((Pollweb_DataLayer) this.dataLayer).getAnswerDAO().findBySurveyResponse(this));
             } catch (DataException ex) {
                 Logger.getLogger(SurveyResponseProxy.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -70,7 +70,7 @@ public class SurveyResponseProxy extends SurveyResponseImpl {
     public Survey getSurvey() {
         if (super.getSurvey() == null) {
             try {
-                super.setSurvey(((SurveyDAO) this.dataLayer.getDAO(Survey.class)).findById(surveyId));
+                super.setSurvey(((Pollweb_DataLayer) this.dataLayer).getSurveyDAO().findById(surveyId));
             } catch (DataException ex) {
                 Logger.getLogger(SurveyResponseProxy.class.getName()).log(Level.SEVERE, null, ex);
             }

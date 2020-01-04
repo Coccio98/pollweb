@@ -7,7 +7,6 @@ package it.univaq.f4i.iw.pollweb.data.impl;
 
 import it.univaq.f4i.iw.pollweb.data.model.Answer;
 import it.univaq.f4i.iw.pollweb.data.model.Question;
-import java.util.Objects;
 
 /**
  *

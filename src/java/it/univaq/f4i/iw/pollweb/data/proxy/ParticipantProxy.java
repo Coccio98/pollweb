@@ -6,38 +6,26 @@
 package it.univaq.f4i.iw.pollweb.data.proxy;
 
 import it.univaq.f4i.iw.framework.data.DataLayer;
-import it.univaq.f4i.iw.pollweb.data.impl.UserImpl;
+import it.univaq.f4i.iw.pollweb.data.impl.ParticipantImpl;
 
 /**
  *
  * @author Pagliarini Alberto
  */
-public class UserProxy extends UserImpl{
+public class ParticipantProxy extends ParticipantImpl{
     
     private DataLayer dataLayer;
     private boolean dirty;
     
-    public UserProxy(DataLayer dl){
+    public ParticipantProxy(DataLayer dl){
         super();
         this.dataLayer = dl;
         this.dirty = false;
     }
-
+    
     @Override
     public void setId(long id) {
         super.setId(id);
-        setDirty(true);
-    }
-    
-    @Override
-    public void setName(String name) {
-        super.setName(name);
-        setDirty(true);
-    }
-    
-    @Override
-    public void setSurname(String surname) {
-        super.setSurname(surname);
         setDirty(true);
     }
     
@@ -54,8 +42,14 @@ public class UserProxy extends UserImpl{
     }
     
     @Override
-    public void setType(Type type) {
-        super.setType(type);
+    public void setName(String name) {
+        super.setName(name);
+        setDirty(true);
+    }
+    
+    @Override
+    public void setSubmitted(boolean b) {
+        super.setSubmitted(b);
         setDirty(true);
     }
     
@@ -73,5 +67,5 @@ public class UserProxy extends UserImpl{
 
     public void setDirty(boolean dirty) {
         this.dirty = dirty;
-    }
+    }  
 }

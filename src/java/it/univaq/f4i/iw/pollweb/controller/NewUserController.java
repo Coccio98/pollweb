@@ -5,14 +5,12 @@
  */
 package it.univaq.f4i.iw.pollweb.controller;
 
-import it.univaq.f4i.iw.framework.data.DataLayer;
 import it.univaq.f4i.iw.framework.result.FailureResult;
 import it.univaq.f4i.iw.framework.result.TemplateManagerException;
 import it.univaq.f4i.iw.framework.result.TemplateResult;
 import it.univaq.f4i.iw.framework.security.SecurityLayer;
 import it.univaq.f4i.iw.pollweb.data.dao.Pollweb_DataLayer;
 import it.univaq.f4i.iw.pollweb.data.model.User;
-import it.univaq.f4i.iw.pollweb.data.dao.UserDAO;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

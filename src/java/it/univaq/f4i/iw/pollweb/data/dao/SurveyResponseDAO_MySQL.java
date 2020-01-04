@@ -136,7 +136,7 @@ public class SurveyResponseDAO_MySQL extends DAO implements SurveyResponseDAO {
                     id = rs.getLong(1);
                 }
                 for (Answer answer: sr.getAnswers()) {
-                    ((AnswerDAO) this.dataLayer.getDAO(Answer.class)).saveOrUpdate(answer, id);
+                    ((Pollweb_DataLayer) this.dataLayer).getAnswerDAO().saveOrUpdate(answer, id);
                 }
             } catch (SQLException ex) {
                 throw new DataException("Unable to save SurveyResponse", ex);

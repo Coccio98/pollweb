@@ -7,13 +7,11 @@ package it.univaq.f4i.iw.pollweb.data.proxy;
 
 import it.univaq.f4i.iw.framework.data.DataException;
 import it.univaq.f4i.iw.framework.data.DataLayer;
+import it.univaq.f4i.iw.pollweb.data.dao.Pollweb_DataLayer;
 import it.univaq.f4i.iw.pollweb.data.model.Question;
 import it.univaq.f4i.iw.pollweb.data.model.User;
 import it.univaq.f4i.iw.pollweb.data.impl.SurveyImpl;
 import it.univaq.f4i.iw.pollweb.data.model.SurveyResponse;
-import it.univaq.f4i.iw.pollweb.data.dao.QuestionDAO;
-import it.univaq.f4i.iw.pollweb.data.dao.SurveyResponseDAO;
-import it.univaq.f4i.iw.pollweb.data.dao.UserDAO;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,6 +27,7 @@ public class SurveyProxy extends SurveyImpl {
     private long managerId;
 
     public SurveyProxy(DataLayer dl) {
+        super();
         super.setManager(null);
         super.setQuestions(null);
         super.setResponses(null);
@@ -55,7 +54,7 @@ public class SurveyProxy extends SurveyImpl {
     public User getManager() {
         if (super.getManager() == null) {
             try {
-                super.setManager(((UserDAO) this.dataLayer.getDAO(User.class)).findById(this.managerId));
+                super.setManager(((Pollweb_DataLayer) this.dataLayer).getUserDAO().findById(this.managerId));
             } catch (DataException ex) {
                 Logger.getLogger(SurveyProxy.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -73,7 +72,7 @@ public class SurveyProxy extends SurveyImpl {
     public List<Question> getQuestions() {
         if (super.getQuestions() == null || super.getQuestions().size() <= 0) {
             try {
-                super.setQuestions(((QuestionDAO) this.dataLayer.getDAO(Question.class)).findBySurvey(this));
+                super.setQuestions(((Pollweb_DataLayer) this.dataLayer).getQuestionDAO().findBySurvey(this));
             } catch (DataException ex) {
                 Logger.getLogger(SurveyProxy.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -91,7 +90,7 @@ public class SurveyProxy extends SurveyImpl {
     public List<SurveyResponse> getResponses() {
         if (super.getResponses() == null) {
             try {
-                super.setResponses(((SurveyResponseDAO) this.dataLayer.getDAO(SurveyResponse.class)).findBySurvey(this));
+                super.setResponses(((Pollweb_DataLayer) this.dataLayer).getSurveyResponseDAO().findBySurvey(this));
             } catch (DataException ex) {
                 Logger.getLogger(SurveyProxy.class.getName()).log(Level.SEVERE, null, ex);
             }

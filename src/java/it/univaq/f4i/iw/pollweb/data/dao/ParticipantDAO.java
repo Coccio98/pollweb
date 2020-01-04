@@ -6,7 +6,7 @@
 package it.univaq.f4i.iw.pollweb.data.dao;
 
 import it.univaq.f4i.iw.framework.data.DataException;
-import it.univaq.f4i.iw.pollweb.data.impl.ParticipantImpl;
+import it.univaq.f4i.iw.pollweb.data.model.Participant;
 import it.univaq.f4i.iw.pollweb.data.model.Survey;
 import java.util.List;
 
@@ -16,6 +16,7 @@ import java.util.List;
  */
 public interface ParticipantDAO {
     
-    List<ParticipantImpl> findBySurvey(Survey Survey) throws DataException;
-    void saveOrUpdate(ParticipantImpl participant, long surveyId) throws DataException;
+    Participant createParticipant();
+    List<Participant> findBySurvey(Survey Survey) throws DataException;
+    void saveOrUpdate(Participant participant, long surveyId) throws DataException;
 }

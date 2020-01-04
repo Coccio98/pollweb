@@ -5,6 +5,8 @@
  */
 package it.univaq.f4i.iw.pollweb.data.impl;
 
+import it.univaq.f4i.iw.pollweb.data.model.ChoiceQuestion;
+import it.univaq.f4i.iw.pollweb.data.model.Option;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,45 +14,52 @@ import java.util.List;
  *
  * @author andrea
  */
-public class ChoiceQuestionImpl extends QuestionImpl {
+public class ChoiceQuestionImpl extends QuestionImpl implements ChoiceQuestion {
     
     public final static short UNCOSTRAINED = 0;
     
     private short maxNumberOfChoices;
     private short minNumberOfChoices;
-    private List<OptionImpl> options = new ArrayList<>();
+    private List<Option> options = new ArrayList<>();
 
     public ChoiceQuestionImpl() {
         this.maxNumberOfChoices = UNCOSTRAINED;
         this.minNumberOfChoices = UNCOSTRAINED;
     }
     
+    @Override
     public short getMaxNumberOfChoices() {
         return maxNumberOfChoices;
     }
-
+    
+    @Override
     public void setMaxNumberOfChoices(short maxNumberOfChoices) {
         this.maxNumberOfChoices = maxNumberOfChoices;
     }
     
+    @Override
     public short getMinNumberOfChoices() {
         return minNumberOfChoices;
     }
-
+    
+    @Override
     public void setMinNumberOfChoices(short minNumberOfChoices) {
         this.minNumberOfChoices = minNumberOfChoices;
     }
-
-    public List<OptionImpl> getOptions() {
+    
+    @Override
+    public List<Option> getOptions() {
         return options;
     }
-
-    public void setOptions(List<OptionImpl> choices) {
+    
+    @Override
+    public void setOptions(List<Option> choices) {
         this.options = choices;
     }
     
-    public OptionImpl getOption(short position) {
-        for (OptionImpl o: this.options) {
+    @Override
+    public Option getOption(short position) {
+        for (Option o: this.options) {
             if (o.getPosition() == position) {
                 return o;
             }
@@ -58,7 +67,8 @@ public class ChoiceQuestionImpl extends QuestionImpl {
         return null;
     }
     
-    public void addOption(OptionImpl  option) {
+    @Override
+    public void addOption(Option  option) {
         this.options.add(option);
     }
     

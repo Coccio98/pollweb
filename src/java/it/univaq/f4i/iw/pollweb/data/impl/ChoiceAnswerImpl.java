@@ -6,6 +6,8 @@
 package it.univaq.f4i.iw.pollweb.data.impl;
 
 import it.univaq.f4i.iw.pollweb.data.model.ChoiceAnswer;
+import it.univaq.f4i.iw.pollweb.data.model.ChoiceQuestion;
+import it.univaq.f4i.iw.pollweb.data.model.Option;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,25 +17,25 @@ import java.util.List;
  */
 public class ChoiceAnswerImpl extends AnswerImpl implements ChoiceAnswer{
     
-    private List<OptionImpl> answers;
+    private List<Option> answers;
     
     public ChoiceAnswerImpl() {
         this.answers = new ArrayList<>();
     }
     
     @Override
-    public List<OptionImpl> getOptions() {
+    public List<Option> getOptions() {
         return answers;
     }
     
     @Override
-    public void setAnswers(List<OptionImpl> answers) {
+    public void setAnswers(List<Option> answers) {
         this.answers = answers;
     }
     
     @Override
-    public boolean contains(OptionImpl option){
-        for(OptionImpl o: this.answers){
+    public boolean contains(Option option){
+        for(Option o: this.answers){
             if(o.getText().equals(option.getText())){
                 return true;
             }
@@ -43,14 +45,14 @@ public class ChoiceAnswerImpl extends AnswerImpl implements ChoiceAnswer{
     
     @Override
     public boolean isValid(){ 
-        if(this.getQuestion() != null && (this.getQuestion() instanceof ChoiceQuestionImpl)){
-            ChoiceQuestionImpl question =(ChoiceQuestionImpl) this.getQuestion();
+        if(this.getQuestion() != null && (this.getQuestion() instanceof ChoiceQuestion)){
+            ChoiceQuestion question =(ChoiceQuestion) this.getQuestion();
         
-            if((question.getMaxNumberOfChoices()!= question.UNCOSTRAINED) && (
+            if((question.getMaxNumberOfChoices()!= 0) && (
                     question.getMaxNumberOfChoices() < this.getOptions().size())){
                 return false;       
             }
-            if((question.getMinNumberOfChoices()!= question.UNCOSTRAINED) && (
+            if((question.getMinNumberOfChoices()!= 0) && (
                     question.getMinNumberOfChoices() > this.getOptions().size())){
                 return false;       
             }
@@ -63,8 +65,8 @@ public class ChoiceAnswerImpl extends AnswerImpl implements ChoiceAnswer{
     @Override
     public String toString() {
         String s = "";
-        for(OptionImpl o: this.getOptions()){
-            s = s + o.getPosition() + ". " + o.getText() + ",";
+        for(Option o: this.getOptions()){
+            s = s + (o.getPosition()+1) + ".  " + o.getText() + ", ";
         }
         return s;
     }

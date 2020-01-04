@@ -5,7 +5,6 @@
  */
 package it.univaq.f4i.iw.pollweb.data.model;
 
-import it.univaq.f4i.iw.pollweb.data.impl.OptionImpl;
 import java.util.List;
 
 /**
@@ -14,11 +13,11 @@ import java.util.List;
  */
 public interface ChoiceAnswer extends Answer{
     
-    List<OptionImpl> getOptions();
+    List<Option> getOptions();
 
-    void setAnswers(List<OptionImpl> answers);
+    void setAnswers(List<Option> answers);
     
-    boolean contains(OptionImpl option);
+    boolean contains(Option option);
     
     @Override
     boolean isValid();

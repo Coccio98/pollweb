@@ -6,23 +6,22 @@
 package it.univaq.f4i.iw.pollweb.data.proxy;
 
 import it.univaq.f4i.iw.framework.data.DataLayer;
-import it.univaq.f4i.iw.pollweb.data.impl.UserImpl;
+import it.univaq.f4i.iw.pollweb.data.impl.OptionImpl;
 
 /**
  *
  * @author Pagliarini Alberto
  */
-public class UserProxy extends UserImpl{
-    
+public class OptionProxy extends OptionImpl{
     private DataLayer dataLayer;
     private boolean dirty;
     
-    public UserProxy(DataLayer dl){
+    public OptionProxy(DataLayer dl){
         super();
         this.dataLayer = dl;
         this.dirty = false;
     }
-
+    
     @Override
     public void setId(long id) {
         super.setId(id);
@@ -30,32 +29,14 @@ public class UserProxy extends UserImpl{
     }
     
     @Override
-    public void setName(String name) {
-        super.setName(name);
+    public void setPosition(short number) {
+        super.setPosition(number);
         setDirty(true);
     }
     
     @Override
-    public void setSurname(String surname) {
-        super.setSurname(surname);
-        setDirty(true);
-    }
-    
-    @Override
-    public void setEmail(String email) {
-        super.setEmail(email);
-        setDirty(true);
-    }
-    
-    @Override
-    public void setPassword(String password) {
-        super.setPassword(password);
-        setDirty(true);
-    }
-    
-    @Override
-    public void setType(Type type) {
-        super.setType(type);
+    public void setText(String text) {
+        super.setText(text);
         setDirty(true);
     }
     
@@ -73,5 +54,5 @@ public class UserProxy extends UserImpl{
 
     public void setDirty(boolean dirty) {
         this.dirty = dirty;
-    }
+    }  
 }

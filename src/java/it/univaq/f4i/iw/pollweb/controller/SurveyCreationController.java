@@ -5,33 +5,26 @@
  */
 package it.univaq.f4i.iw.pollweb.controller;
 
-import it.univaq.f4i.iw.framework.data.DataException;
-import it.univaq.f4i.iw.framework.data.DataLayer;
 import it.univaq.f4i.iw.framework.result.FailureResult;
 import it.univaq.f4i.iw.framework.result.TemplateManagerException;
 import it.univaq.f4i.iw.framework.result.TemplateResult;
 import it.univaq.f4i.iw.framework.security.SecurityLayer;
 import it.univaq.f4i.iw.pollweb.data.model.Survey;
-import it.univaq.f4i.iw.pollweb.data.impl.ChoiceQuestionImpl;
-import it.univaq.f4i.iw.pollweb.data.impl.DateQuestionImpl;
-import it.univaq.f4i.iw.pollweb.data.impl.NumberQuestionImpl;
+import it.univaq.f4i.iw.pollweb.data.model.ChoiceQuestion;
+import it.univaq.f4i.iw.pollweb.data.model.DateQuestion;
+import it.univaq.f4i.iw.pollweb.data.model.NumberQuestion;
 import it.univaq.f4i.iw.pollweb.data.model.Question;
 import it.univaq.f4i.iw.pollweb.data.model.ReservedSurvey;
-import it.univaq.f4i.iw.pollweb.data.impl.ShortTextQuestionImpl;
-import it.univaq.f4i.iw.pollweb.data.impl.TextQuestionImpl;
-import it.univaq.f4i.iw.pollweb.data.impl.OptionImpl;
+import it.univaq.f4i.iw.pollweb.data.model.ShortTextQuestion;
+import it.univaq.f4i.iw.pollweb.data.model.TextQuestion;
+import it.univaq.f4i.iw.pollweb.data.model.Option;
 import it.univaq.f4i.iw.pollweb.data.model.User;
 import it.univaq.f4i.iw.pollweb.data.dao.OptionDAO;
 import it.univaq.f4i.iw.pollweb.data.dao.QuestionDAO;
-import it.univaq.f4i.iw.pollweb.data.dao.SurveyDAO;
-import it.univaq.f4i.iw.pollweb.data.dao.SurveyResponseDAO;
-import it.univaq.f4i.iw.pollweb.data.dao.UserDAO;
 import it.univaq.f4i.iw.pollweb.data.dao.Pollweb_DataLayer;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.Month;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.ServletException;
@@ -111,6 +104,7 @@ public class SurveyCreationController extends PollWebBaseController {
     private void action_add_question(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException, TemplateManagerException {
         try{
             TemplateResult res = new TemplateResult(getServletContext());
+            QuestionDAO dao = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getQuestionDAO();
             if(request.getParameter("text") != null &&
                 request.getParameter("note") != null &&
                 request.getParameter("mandatory") != null &&
@@ -118,19 +112,19 @@ public class SurveyCreationController extends PollWebBaseController {
                 Question q = null;
                 switch(request.getParameter("type")){
                     case "shortText":
-                        q = new ShortTextQuestionImpl();
+                        q = dao.createShortTextQuestion();
                         break;
                     case "longText":
-                        q = new TextQuestionImpl();
+                        q = dao.createTextQuestion();
                         break;
                     case "number":
-                        q = new NumberQuestionImpl();
+                        q = dao.createNumberQuestion();
                     break;
                     case "date":
-                        q = new DateQuestionImpl();
+                        q = dao.createDateQuestion();
                     break;
                     case "choice":
-                        q = new ChoiceQuestionImpl();
+                        q = dao.createChoiceQuestion();
                     break;
                 default:
                     request.setAttribute("message", "Invalid Type");
@@ -146,7 +140,7 @@ public class SurveyCreationController extends PollWebBaseController {
                 }
                 q.setPosition((short)SecurityLayer.checkNumeric(request.getParameter("position")));
                 
-                (((Pollweb_DataLayer) request.getAttribute("datalayer")).getQuestionDAO()).newQuestion(q, SecurityLayer.checkNumeric(request.getParameter("surveyId")));
+                dao.newQuestion(q, SecurityLayer.checkNumeric(request.getParameter("surveyId")));
                 request.setAttribute("questionId", q.getId());
                 request.setAttribute("type", request.getParameter("type"));
             } else {
@@ -191,7 +185,7 @@ public class SurveyCreationController extends PollWebBaseController {
                                 min = SecurityLayer.checkNumeric(request.getParameter("minValue"));
                             }
                             if (max >= min){
-                                ShortTextQuestionImpl q = new ShortTextQuestionImpl();
+                                ShortTextQuestion q = dao.createShortTextQuestion();
                                 q.setId(SecurityLayer.checkNumeric(request.getParameter("questionId")));
                                 q.setMaxLength(max);
                                 q.setMinLength(min);                      
@@ -220,7 +214,7 @@ public class SurveyCreationController extends PollWebBaseController {
                             min = SecurityLayer.checkNumeric(request.getParameter("minValue"));
                         }
                         if (max >= min){
-                            TextQuestionImpl q = new TextQuestionImpl();
+                            TextQuestion q = dao.createTextQuestion();
                             q.setId(SecurityLayer.checkNumeric(request.getParameter("questionId")));
                             q.setMaxLength(max);
                             q.setMinLength(min);
@@ -244,7 +238,7 @@ public class SurveyCreationController extends PollWebBaseController {
                             min = SecurityLayer.checkNumeric(request.getParameter("minValue"));
                         }
                         if (max >= min){
-                            NumberQuestionImpl q = new NumberQuestionImpl();
+                            NumberQuestion q = dao.createNumberQuestion();
                             q.setId(SecurityLayer.checkNumeric(request.getParameter("questionId")));
                             q.setMaxValue(max);
                             q.setMinValue(min);
@@ -270,7 +264,7 @@ public class SurveyCreationController extends PollWebBaseController {
                             localDateMin = LocalDate.of(1, Month.JANUARY, 1);
                         }
                         if(!(localDateMin.isAfter(localDateMax))){
-                            DateQuestionImpl q = new DateQuestionImpl();
+                            DateQuestion q = dao.createDateQuestion();
                             q.setId(SecurityLayer.checkNumeric(request.getParameter("questionId")));
                             q.setMaxDate(localDateMax);
                             q.setMinDate(localDateMin);
@@ -297,7 +291,7 @@ public class SurveyCreationController extends PollWebBaseController {
                                 min = 0;
                             }
                             if (max >= min){
-                                ChoiceQuestionImpl q = new ChoiceQuestionImpl();
+                                ChoiceQuestion q = dao.createChoiceQuestion();
                                 q.setId(SecurityLayer.checkNumeric(request.getParameter("questionId")));
                                 q.setMaxNumberOfChoices((short)max);
                                 q.setMinNumberOfChoices((short)min);
@@ -342,17 +336,18 @@ public class SurveyCreationController extends PollWebBaseController {
     private void action_add_choices(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException, TemplateManagerException {
         try{
             TemplateResult res = new TemplateResult(getServletContext());
-            List<OptionImpl> options = new ArrayList<>();
+            List<Option> options = new ArrayList<>();
             short i=0;
+            OptionDAO optionDao = (((Pollweb_DataLayer) request.getAttribute("datalayer")).getOptionDAO());
             for (String s: request.getParameterValues("option")) {
-                OptionImpl o = new OptionImpl();
+                Option o = optionDao.createOption();
                 o.setPosition(i);
                 o.setText(s);
                 options.add(o);
                 i++;
             }
-            for(OptionImpl op: options){
-                ((OptionDAO) ((DataLayer) request.getAttribute("datalayer")).getDAO(OptionImpl.class)).saveOrUpdate(op, SecurityLayer.checkNumeric(request.getParameter("questionId")));
+            for(Option op: options){
+                optionDao.saveOrUpdate(op, SecurityLayer.checkNumeric(request.getParameter("questionId")));
             }
             request.setAttribute("surveyId", request.getParameter("surveyId"));
             request.setAttribute("position", request.getParameter("position"));
@@ -371,20 +366,14 @@ public class SurveyCreationController extends PollWebBaseController {
             if (SecurityLayer.checkSession(request) != null) {
                 if (request.getParameter("create") != null) {
                     action_create_survey(request, response);    
+                } else if (request.getParameter("addQuestion") != null){
+                    action_add_question(request, response);
+                } else if(request.getParameter("saveQuestion")!= null){
+                    action_update_question(request, response);
+                } else if(request.getParameter("saveOptions")!= null){
+                    action_add_choices(request, response);
                 } else {
-                    if (request.getParameter("addQuestion") != null){
-                        action_add_question(request, response);
-                    } else {
-                        if(request.getParameter("saveQuestion")!= null){
-                            action_update_question(request, response);
-                        } else {
-                            if(request.getParameter("saveOptions")!= null){
-                                action_add_choices(request, response);
-                            } else {
-                                action_default(request, response);
-                            }
-                        }
-                    }
+                    action_default(request, response);
                 }
             }else {
                 request.setAttribute("message", "You must be logged");

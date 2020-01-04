@@ -5,28 +5,26 @@
  */
 package it.univaq.f4i.iw.pollweb.controller;
 
-import it.univaq.f4i.iw.framework.data.DataLayer;
 import it.univaq.f4i.iw.framework.result.CsvFileWriter;
 import it.univaq.f4i.iw.framework.result.FailureResult;
 import it.univaq.f4i.iw.framework.result.TemplateManagerException;
 import it.univaq.f4i.iw.framework.result.TemplateResult;
 import it.univaq.f4i.iw.framework.security.SecurityLayer;
-import it.univaq.f4i.iw.pollweb.data.impl.ChoiceQuestionImpl;
-import it.univaq.f4i.iw.pollweb.data.impl.DateQuestionImpl;
-import it.univaq.f4i.iw.pollweb.data.impl.NumberQuestionImpl;
-import it.univaq.f4i.iw.pollweb.data.impl.OptionImpl;
-import it.univaq.f4i.iw.pollweb.data.impl.ParticipantImpl;
+import it.univaq.f4i.iw.pollweb.data.model.ChoiceQuestion;
+import it.univaq.f4i.iw.pollweb.data.model.DateQuestion;
+import it.univaq.f4i.iw.pollweb.data.model.NumberQuestion;
+import it.univaq.f4i.iw.pollweb.data.model.Option;
+import it.univaq.f4i.iw.pollweb.data.model.Participant;
 import it.univaq.f4i.iw.pollweb.data.model.Question;
-import it.univaq.f4i.iw.pollweb.data.impl.ShortTextQuestionImpl;
+import it.univaq.f4i.iw.pollweb.data.model.ShortTextQuestion;
 import it.univaq.f4i.iw.pollweb.data.model.Survey;
-import it.univaq.f4i.iw.pollweb.data.impl.TextQuestionImpl;
+import it.univaq.f4i.iw.pollweb.data.model.TextQuestion;
 import it.univaq.f4i.iw.pollweb.data.model.User;
 import it.univaq.f4i.iw.pollweb.data.dao.OptionDAO;
 import it.univaq.f4i.iw.pollweb.data.dao.ParticipantDAO;
 import it.univaq.f4i.iw.pollweb.data.dao.Pollweb_DataLayer;
 import it.univaq.f4i.iw.pollweb.data.dao.QuestionDAO;
 import it.univaq.f4i.iw.pollweb.data.dao.SurveyDAO;
-import it.univaq.f4i.iw.pollweb.data.dao.UserDAO;
 import java.io.IOException;
 import java.time.LocalDate;
 import javax.servlet.ServletException;
@@ -73,24 +71,25 @@ public class MySurveyController extends PollWebBaseController {
          try {
             TemplateResult res = new TemplateResult(getServletContext());
             Survey survey =(((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyDAO()).findById(m);
+            QuestionDAO questionDao= ((Pollweb_DataLayer) request.getAttribute("datalayer")).getQuestionDAO();
             if(survey.getManager().getId() == (long)request.getSession().getAttribute("userid")){
                 if(request.getParameter("up") != null && request.getParameter("down") == null && request.getParameter("del") == null && SecurityLayer.checkNumeric(request.getParameter("up")) > 0){
                     int up = SecurityLayer.checkNumeric(request.getParameter("up"));
                     survey.getQuestions().get(up).setPosition((short)(up-1));
                     survey.getQuestions().get(up-1).setPosition((short)up);
-                    (((Pollweb_DataLayer) request.getAttribute("datalayer")).getQuestionDAO()).update(survey.getQuestions().get(up), m);
-                    (((Pollweb_DataLayer) request.getAttribute("datalayer")).getQuestionDAO()).update(survey.getQuestions().get(up-1), m);
+                    questionDao.update(survey.getQuestions().get(up), m);
+                    questionDao.update(survey.getQuestions().get(up-1), m);
                 }
                 if(request.getParameter("down") != null && request.getParameter("up") == null && request.getParameter("del") == null && SecurityLayer.checkNumeric(request.getParameter("down")) < (survey.getQuestions().size()-1)){
                     int down = SecurityLayer.checkNumeric(request.getParameter("down"));
                     survey.getQuestions().get(down).setPosition((short)(down+1));
                     survey.getQuestions().get(down+1).setPosition((short)down);
-                    (((Pollweb_DataLayer) request.getAttribute("datalayer")).getQuestionDAO()).update(survey.getQuestions().get(down), m);
-                    (((Pollweb_DataLayer) request.getAttribute("datalayer")).getQuestionDAO()).update(survey.getQuestions().get(down+1), m);
+                    questionDao.update(survey.getQuestions().get(down), m);
+                    questionDao.update(survey.getQuestions().get(down+1), m);
                 }
                 if(request.getParameter("down") == null && request.getParameter("up") == null && request.getParameter("del") != null && !survey.getQuestions().isEmpty()){
                     int del=SecurityLayer.checkNumeric(request.getParameter("del"));
-                    (((Pollweb_DataLayer) request.getAttribute("datalayer")).getQuestionDAO()).delete(survey,del);
+                    questionDao.delete(survey,del);
                 }
                 request.setAttribute("survey", (((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyDAO()).findById(m));
                 request.setAttribute("page_title", "Edit Survey");
@@ -105,34 +104,17 @@ public class MySurveyController extends PollWebBaseController {
         }
     }
     
-    private void enable_survey(HttpServletRequest request, HttpServletResponse response, int e) throws IOException, ServletException, TemplateManagerException {
+    private void toggle_survey(HttpServletRequest request, HttpServletResponse response, int t) throws IOException, ServletException, TemplateManagerException {
         try {
             SurveyDAO dao = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyDAO();
-            Survey survey = dao.findById(e);
+            Survey survey = dao.findById(t);
             if(survey.getManager().getId() == (long)request.getSession().getAttribute("userid")){
                 if (!survey.isActive()){
                     survey.setActive(true);
-                    dao.saveOrUpdate(survey);
-                }               
-            } else {
-                request.setAttribute("message", "This is not your survey");
-                action_error(request, response);
-            }
-        } catch (Exception ex) {
-            request.setAttribute("message", "Data access exception: " + ex.getMessage());
-            action_error(request, response);
-        }
-    }
-    
-    private void disable_survey(HttpServletRequest request, HttpServletResponse response, int d) throws IOException, ServletException, TemplateManagerException {
-        try {
-            SurveyDAO dao = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyDAO();
-            Survey survey = dao.findById(d);
-            if(survey.getManager().getId() == (long)request.getSession().getAttribute("userid")){
-                if (survey.isActive()){                   
-                    survey.setActive(false);  
-                    dao.saveOrUpdate(survey);
-                }              
+                } else {
+                    survey.setActive(false);                      
+                }
+                dao.saveOrUpdate(survey);
             } else {
                 request.setAttribute("message", "This is not your survey");
                 action_error(request, response);
@@ -184,16 +166,17 @@ public class MySurveyController extends PollWebBaseController {
             request.setAttribute("page_title", "Add User");
             SurveyDAO dao = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyDAO();
             Survey survey = dao.findById(u);
+            ParticipantDAO participantDao = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getParticipantDAO();
             if(survey.isReserved()){
                 if(survey.getManager().getId() == (long)request.getSession().getAttribute("userid")){
                     if(request.getParameter("send") != null){
                         if(request.getParameter("name")!=null && request.getParameter("email")!=null && request.getParameter("password")!=null &&
                                 !request.getParameter("name").isEmpty() && !request.getParameter("email").isEmpty() && !request.getParameter("password").isEmpty()){
-                            ParticipantImpl participant = new ParticipantImpl();
+                            Participant participant = participantDao.createParticipant();
                             participant.setName(request.getParameter("name"));
                             participant.setEmail(request.getParameter("email"));
                             participant.setPassword(request.getParameter("password"));
-                            ((ParticipantDAO) ((DataLayer) request.getAttribute("datalayer")).getDAO(ParticipantImpl.class)).saveOrUpdate(participant, u);
+                            participantDao.saveOrUpdate(participant, u);
                         } else {
                             request.setAttribute("error", "Fill all field");
                         }
@@ -223,36 +206,36 @@ public class MySurveyController extends PollWebBaseController {
             if(survey.getManager().getId() == (long)request.getSession().getAttribute("userid")){
                 QuestionDAO questionDao = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getQuestionDAO();
                 Question question = questionDao.findById(m2);
-                
-                    if (request.getParameter("del")!= null){
-                        if (question.getQuestionType().equals("choice")){
-                            ((OptionDAO)((DataLayer) request.getAttribute("datalayer")).getDAO(OptionImpl.class)).delete((ChoiceQuestionImpl)question, SecurityLayer.checkNumeric(request.getParameter("del")));
-                            request.setAttribute("question", questionDao.findById(m2));
-                            request.setAttribute("m1", m1);
-                            request.setAttribute("m2", m2);
-                            request.setAttribute("page_title", "Edit Question");
-                            res.activate("edit_question.ftl.html", request, response);
-                        } else {
-                            request.setAttribute("message", "You should not be here!");
-                            action_error(request, response);
-                        }
-                    } else if(request.getParameter("addOption")!= null &&
-                        request.getParameter("option")!= null &&
-                        !request.getParameter("option").isEmpty()){
-                        if (question.getQuestionType().equals("choice")){
-                            OptionImpl option = new OptionImpl();
-                            option.setText(request.getParameter("option"));
-                            option.setPosition((short)((ChoiceQuestionImpl) question).getOptions().size());
-                            ((OptionDAO)((DataLayer) request.getAttribute("datalayer")).getDAO(OptionImpl.class)).saveOrUpdate(option, m2);                        
-                            request.setAttribute("question", questionDao.findById(m2));
-                            request.setAttribute("m1", m1);
-                            request.setAttribute("m2", m2);
-                            request.setAttribute("page_title", "Edit Question");
-                            res.activate("edit_question.ftl.html", request, response);
-                        } else {
-                            request.setAttribute("message", "You should not be here!");
-                            action_error(request, response);
-                        }
+                OptionDAO optionDao = (((Pollweb_DataLayer) request.getAttribute("datalayer")).getOptionDAO());
+                if (request.getParameter("del")!= null){
+                    if (question.getQuestionType().equals("choice")){
+                        optionDao.delete((ChoiceQuestion)question, SecurityLayer.checkNumeric(request.getParameter("del")));
+                        request.setAttribute("question", questionDao.findById(m2));
+                        request.setAttribute("m1", m1);
+                        request.setAttribute("m2", m2);
+                        request.setAttribute("page_title", "Edit Question");
+                        res.activate("edit_question.ftl.html", request, response);
+                    } else {
+                        request.setAttribute("message", "You should not be here!");
+                        action_error(request, response);
+                    }
+                } else if(request.getParameter("addOption")!= null &&
+                    request.getParameter("option")!= null &&
+                    !request.getParameter("option").isEmpty()){
+                    if (question.getQuestionType().equals("choice")){
+                        Option option = optionDao.createOption();
+                        option.setText(request.getParameter("option"));
+                        option.setPosition((short)((ChoiceQuestion) question).getOptions().size());
+                        optionDao.saveOrUpdate(option, m2);                        
+                        request.setAttribute("question", questionDao.findById(m2));
+                        request.setAttribute("m1", m1);
+                        request.setAttribute("m2", m2);
+                        request.setAttribute("page_title", "Edit Question");
+                        res.activate("edit_question.ftl.html", request, response);
+                    } else {
+                        request.setAttribute("message", "You should not be here!");
+                        action_error(request, response);
+                    }
                     
                 } else if(request.getParameter("save")!= null){
                     if(request.getParameter("text") != null &&
@@ -274,19 +257,19 @@ public class MySurveyController extends PollWebBaseController {
                                     request.getParameter("expression") != null){
 
                                     if(request.getParameter("maxValue").isEmpty() || SecurityLayer.checkNumeric(request.getParameter("maxValue")) > 240){
-                                        ((ShortTextQuestionImpl)question).setMaxLength(240);
+                                        ((ShortTextQuestion)question).setMaxLength(240);
                                     }else{
-                                        ((ShortTextQuestionImpl)question).setMaxLength(SecurityLayer.checkNumeric(request.getParameter("maxValue")));
+                                        ((ShortTextQuestion)question).setMaxLength(SecurityLayer.checkNumeric(request.getParameter("maxValue")));
                                     }
                                     if(request.getParameter("minValue").isEmpty()){
-                                        ((ShortTextQuestionImpl)question).setMinLength(0);
+                                        ((ShortTextQuestion)question).setMinLength(0);
                                     }else{
-                                        ((ShortTextQuestionImpl)question).setMinLength(SecurityLayer.checkNumeric(request.getParameter("minValue")));
+                                        ((ShortTextQuestion)question).setMinLength(SecurityLayer.checkNumeric(request.getParameter("minValue")));
                                     }
                                     if(request.getParameter("expression").isEmpty()){
-                                        ((ShortTextQuestionImpl)question).setPattern(".");
+                                        ((ShortTextQuestion)question).setPattern(".");
                                     }else{
-                                        ((ShortTextQuestionImpl)question).setPattern(request.getParameter("expression"));
+                                        ((ShortTextQuestion)question).setPattern(request.getParameter("expression"));
                                     }
                                 }
                                 break;
@@ -295,14 +278,14 @@ public class MySurveyController extends PollWebBaseController {
                                     request.getParameter("minValue") != null){
 
                                     if(request.getParameter("maxValue").isEmpty() || SecurityLayer.checkNumeric(request.getParameter("maxValue")) > 10000){
-                                        ((TextQuestionImpl)question).setMaxLength(10000);
+                                        ((TextQuestion)question).setMaxLength(10000);
                                     }else{
-                                        ((TextQuestionImpl)question).setMaxLength(SecurityLayer.checkNumeric(request.getParameter("maxValue")));
+                                        ((TextQuestion)question).setMaxLength(SecurityLayer.checkNumeric(request.getParameter("maxValue")));
                                     }
                                     if(request.getParameter("minValue").isEmpty()){
-                                        ((TextQuestionImpl)question).setMinLength(0);
+                                        ((TextQuestion)question).setMinLength(0);
                                     }else{
-                                        ((TextQuestionImpl)question).setMinLength(SecurityLayer.checkNumeric(request.getParameter("minValue")));
+                                        ((TextQuestion)question).setMinLength(SecurityLayer.checkNumeric(request.getParameter("minValue")));
                                     }
                                 }
                                 break;
@@ -311,14 +294,14 @@ public class MySurveyController extends PollWebBaseController {
                                     request.getParameter("minValue") != null){
 
                                     if(request.getParameter("maxValue").isEmpty()){
-                                        ((NumberQuestionImpl)question).setMaxValue(Integer.MAX_VALUE);
+                                        ((NumberQuestion)question).setMaxValue(Integer.MAX_VALUE);
                                     }else{
-                                        ((NumberQuestionImpl)question).setMaxValue(SecurityLayer.checkNumeric(request.getParameter("maxValue")));
+                                        ((NumberQuestion)question).setMaxValue(SecurityLayer.checkNumeric(request.getParameter("maxValue")));
                                     }
                                     if(request.getParameter("minValue").isEmpty()){
-                                        ((NumberQuestionImpl)question).setMinValue(Integer.MIN_VALUE);
+                                        ((NumberQuestion)question).setMinValue(Integer.MIN_VALUE);
                                     }else{
-                                        ((NumberQuestionImpl)question).setMinValue(SecurityLayer.checkNumeric(request.getParameter("minValue")));
+                                        ((NumberQuestion)question).setMinValue(SecurityLayer.checkNumeric(request.getParameter("minValue")));
                                     }
                                 }
                                 break;
@@ -327,11 +310,11 @@ public class MySurveyController extends PollWebBaseController {
                                     request.getParameter("minValue") != null){
                                     if(!request.getParameter("maxValue").isEmpty()){
                                         LocalDate localDate = LocalDate.parse(request.getParameter("maxValue"));
-                                        ((DateQuestionImpl)question).setMaxDate(localDate);
+                                        ((DateQuestion)question).setMaxDate(localDate);
                                     }
                                     if(!request.getParameter("minValue").isEmpty()){
                                         LocalDate localDate = LocalDate.parse(request.getParameter("minValue"));
-                                        ((DateQuestionImpl)question).setMinDate(localDate);
+                                        ((DateQuestion)question).setMinDate(localDate);
                                     }
                                 }
                                 break;
@@ -340,12 +323,12 @@ public class MySurveyController extends PollWebBaseController {
                                     request.getParameter("number") != null){
 
                                     if(!request.getParameter("maxValue").isEmpty() && request.getParameter("maxValue") != "0"){
-                                        ((ChoiceQuestionImpl)question).setMaxNumberOfChoices((short)SecurityLayer.checkNumeric(request.getParameter("maxValue")));
+                                        ((ChoiceQuestion)question).setMaxNumberOfChoices((short)SecurityLayer.checkNumeric(request.getParameter("maxValue")));
                                     } else {
-                                        ((ChoiceQuestionImpl)question).setMaxNumberOfChoices((short)SecurityLayer.checkNumeric(request.getParameter("number")));
+                                        ((ChoiceQuestion)question).setMaxNumberOfChoices((short)SecurityLayer.checkNumeric(request.getParameter("number")));
                                     }
                                     if(!request.getParameter("minValue").isEmpty()){
-                                        ((ChoiceQuestionImpl)question).setMinNumberOfChoices((short)SecurityLayer.checkNumeric(request.getParameter("minValue")));
+                                        ((ChoiceQuestion)question).setMinNumberOfChoices((short)SecurityLayer.checkNumeric(request.getParameter("minValue")));
                                     }                                    
                                 } else {
                                     request.setAttribute("error_creation", "Fill all mandatory fields");
@@ -389,14 +372,10 @@ public class MySurveyController extends PollWebBaseController {
                 if (request.getParameter("m") != null) {
                     edit_survey(request, response, SecurityLayer.checkNumeric(request.getParameter("m")));
                 } else {
-                    if (request.getParameter("e") != null) {
-                        enable_survey(request, response, SecurityLayer.checkNumeric(request.getParameter("e")));
-                    } else {
-                        if (request.getParameter("d") != null) {
-                            disable_survey(request, response, SecurityLayer.checkNumeric(request.getParameter("d")));
-                        } else if (request.getParameter("exp") != null){
+                    if (request.getParameter("t") != null) {
+                        toggle_survey(request, response, SecurityLayer.checkNumeric(request.getParameter("t")));
+                    } else if (request.getParameter("exp") != null){
                             export(request, response, SecurityLayer.checkNumeric(request.getParameter("exp")));
-                        }
                     }
                     if (request.getParameter("a") != null) {
                         add_question(request, response, SecurityLayer.checkNumeric(request.getParameter("a")));

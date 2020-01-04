@@ -5,6 +5,7 @@
  */
 package it.univaq.f4i.iw.pollweb.data.impl;
 
+import it.univaq.f4i.iw.pollweb.data.model.Participant;
 import it.univaq.f4i.iw.pollweb.data.model.ReservedSurvey;
 import java.util.List;
 import java.util.ArrayList;
@@ -15,15 +16,15 @@ import java.util.ArrayList;
  */
 public class ReservedSurveyImpl extends SurveyImpl implements ReservedSurvey{
     
-    private List<ParticipantImpl> participants = new ArrayList<>();
+    private List<Participant> participants = new ArrayList<>();
     
     @Override
-    public List<ParticipantImpl> getParticipants() {
+    public List<Participant> getParticipants() {
         return participants;
     }
     
     @Override
-    public void setParticipants(List<ParticipantImpl> participants) {
+    public void setParticipants(List<Participant> participants) {
         this.participants = participants;
     }
     
