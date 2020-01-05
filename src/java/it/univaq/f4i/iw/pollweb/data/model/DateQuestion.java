@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 /**
  *
- * @author Pagliarini Alberto
+ * @author Pagliarini Andrea
  */
 public interface DateQuestion extends Question{
     

@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  *
- * @author Pagliarini Alberto
+ * @author Pagliarini Andrea
  */
 public class ChoiceQuestionProxy extends ChoiceQuestionImpl{
     private DataLayer dataLayer;

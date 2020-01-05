@@ -10,7 +10,7 @@ import it.univaq.f4i.iw.pollweb.data.impl.ShortTextQuestionImpl;
 
 /**
  *
- * @author Pagliarini Alberto
+ * @author Pagliarini Andrea
  */
 public class ShortTextQuestionProxy extends ShortTextQuestionImpl{
     private DataLayer dataLayer;

@@ -18,9 +18,9 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  *
- * @author Pagliarini Alberto
+ * @author Pagliarini Andrea
  */
-public class NewUserController extends PollWebBaseController {
+public class UserManagemant extends PollWebBaseController {
     
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
@@ -38,6 +38,7 @@ public class NewUserController extends PollWebBaseController {
         }
     }
     
+    //apre la schermata di gestione dei manager
     private void action_default(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException, TemplateManagerException {
         try {
             TemplateResult res = new TemplateResult(getServletContext());
@@ -50,9 +51,11 @@ public class NewUserController extends PollWebBaseController {
         }
     }
     
+    //aggiunta di un manager
     private void add_user(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException, TemplateManagerException {
         try {
             User user = (((Pollweb_DataLayer) request.getAttribute("datalayer")).getUserDAO()).createUser();
+            //verifica che tutti i campi siano riempiti
             if(request.getParameter("name")!= null && !request.getParameter("name").isEmpty() &&
                     request.getParameter("surname")!= null && !request.getParameter("surname").isEmpty() &&
                     request.getParameter("email")!= null && !request.getParameter("email").isEmpty() &&
@@ -74,7 +77,13 @@ public class NewUserController extends PollWebBaseController {
     @Override
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
+            //se un partecipante dovesse essere loggato quando si trova in questo punto viene fatto il log out del suddetto
+            if(request.getSession().getAttribute("p") != null){
+                request.getSession().removeAttribute("p");
+            }
+            //controllo se un manager ha effettuato un login
             if (SecurityLayer.checkSession(request) != null) {
+                //controllo se un admin ha effettuato un login
                 if(request.getSession().getAttribute("type") == User.Type.ADMINISTRATOR){
                     if(request.getParameter("add") != null){
                         add_user(request,response);

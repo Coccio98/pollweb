@@ -40,35 +40,3 @@
         <img src="images/plus.svg" alt="add" class="imgButton add" title="Add Survey" onclick="location.href='survey_creation'" />
     </div>
 </#if>
-<#if u??>
-    <div class="wrapper">
-        <div class="left">
-        <#if error??>
-        <h3 class="error">${error}</h3>
-        </#if>
-        <form action="my_surveys" method="post">
-            <input type="hidden" name="u" value=${u.getId()}>
-            <h3>Full Name*</h3>
-            <input type="text" name="name" class="medium">
-            <h3>E-mail*</h3>
-            <input type="email" name="email" class="medium">
-            <h3>Password*</h3>
-            <input type="password" name="password" class="medium"></br></br>
-            <input type="submit" name="send" value="Send" class="medium"/></br></br>
-        </form>
-        </div>
-        <div class="rigth">
-            <h3>All Participants</h3>
-            <ul class="list">
-                <#list u.getParticipants() as participant>
-                    <h3>
-                        <li>
-                        ${participant.getName()}
-                        ${participant.getEmail()}
-                        </li>
-                    </h3>
-                </#list>
-            </ul>
-        </div>
-    </div>
-</#if>

@@ -10,7 +10,7 @@ import it.univaq.f4i.iw.pollweb.data.impl.TextQuestionImpl;
 
 /**
  *
- * @author Pagliarini Alberto
+ * @author Pagliarini Andrea
  */
 public class TextQuestionProxy extends TextQuestionImpl{
     

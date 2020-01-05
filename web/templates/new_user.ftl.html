@@ -1,8 +1,6 @@
 <div class="wrapper">
     <div class="left">
-        <#if error??>
-            <h3 class="error">${error}</h3>
-        </#if>
+        <h3 class="error">${(error)!}</h3>
         <form action="new_user" method="post">
             <h3>Name*</h3>
             <input type="text" name="name" class="medium"/>

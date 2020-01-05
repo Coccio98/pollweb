@@ -8,23 +8,23 @@
     </resource-ref>
     <servlet>
         <servlet-name>survey</servlet-name>
-        <servlet-class>it.univaq.f4i.iw.pollweb.controller.SurveyController</servlet-class>
+        <servlet-class>it.univaq.f4i.iw.pollweb.controller.SurveyAndResponse</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>login</servlet-name>
-        <servlet-class>it.univaq.f4i.iw.pollweb.controller.LoginController</servlet-class>
+        <servlet-class>it.univaq.f4i.iw.pollweb.controller.UserLogin</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>survey_creation</servlet-name>
-        <servlet-class>it.univaq.f4i.iw.pollweb.controller.SurveyCreationController</servlet-class>
+        <servlet-class>it.univaq.f4i.iw.pollweb.controller.SurveyCreator</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>my_surveys</servlet-name>
-        <servlet-class>it.univaq.f4i.iw.pollweb.controller.MySurveyController</servlet-class>
+        <servlet-class>it.univaq.f4i.iw.pollweb.controller.MySurveyVisualizeAndEdit</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>new_user</servlet-name>
-        <servlet-class>it.univaq.f4i.iw.pollweb.controller.NewUserController</servlet-class>
+        <servlet-class>it.univaq.f4i.iw.pollweb.controller.UserManagemant</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>survey</servlet-name>

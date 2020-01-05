@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  *
- * @author Pagliarini Alberto
+ * @author Pagliarini Andrea
  */
 public class CsvFileWriter {
     //Delimiter used in CSV file
@@ -41,7 +41,7 @@ public class CsvFileWriter {
             //Add a new line separator after the header
             fileWriter.append(NEW_LINE_SEPARATOR);
             int i=1;
-            //Write a new student object list to the CSV file
+            //Write a Survey Responses list to the CSV file
             for (SurveyResponse response : sr) {
                 List<Answer> answers = response.getAnswers();
                 for(Answer answer: answers){

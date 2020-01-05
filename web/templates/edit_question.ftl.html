@@ -52,6 +52,7 @@
                 </table>
                 <input type="text" name="option" class="medium"/></br></br>
                 <input type="submit" name="addOption" class="medium" value="Add Option"/>
+                <h3 class="error">${(error_creation)!}</h3>
                 <h3>Max Choice</h3>
                 <input type="number" name="maxValue" min=0 class="medium" value="#{question.getMaxNumberOfChoices()}"/>
                 <h3>Min Choice</h3>

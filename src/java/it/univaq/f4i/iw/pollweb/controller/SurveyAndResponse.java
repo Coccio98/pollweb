@@ -41,7 +41,7 @@ import javax.servlet.http.HttpSession;
  *
  * @author Pagliarini Andrea
  */
-public class SurveyController extends PollWebBaseController {
+public class SurveyAndResponse extends PollWebBaseController {
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      *
@@ -60,6 +60,7 @@ public class SurveyController extends PollWebBaseController {
     }
     private void action_survey_list(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException, TemplateManagerException {
         try {
+            //genera la lista di tutti i sondaggi pubblici aperti
             TemplateResult res = new TemplateResult(getServletContext());
             request.setAttribute("page_title", "Surveys");
             request.setAttribute("surveys", (((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyDAO()).findAllNotReserved());
@@ -74,25 +75,31 @@ public class SurveyController extends PollWebBaseController {
         try {
             SurveyDAO dao = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyDAO();
             Survey survey = dao.findByIdOpen(n);
+            //verifica che il sondaggio esista
             if (survey != null) {
                 TemplateResult res = new TemplateResult(getServletContext());
-                if(request.getSession().getAttribute("p") != null){
-                    request.setAttribute("page_title", survey.getTitle());
-                    request.setAttribute("survey", survey);
-                    if(request.getAttribute("send")!= null){
-                        request.getSession().invalidate();
-                    }
-                }else{                    
-                    if(survey.isReserved()){                    
-                        request.setAttribute("login", "");
+                //verifica se un partecipante sia loggato in questo punto,
+                //se lo è viene sloggato
+                if(request.getSession().getAttribute("p") != null){                    
+                    request.getSession().removeAttribute("p");
+                    request.setAttribute("surveys", (((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyDAO()).findAllNotReserved());
+                    res.activate("surveys.ftl.html", request, response);                  
+                }else{
+                    //controllo sul sondaggio, se è pubblico si viene postati alla schermata di compilazione
+                    //se privato si viene portati alla schermata di log in
+                    if(survey.isReserved()){
+                        //attributo utilizzato come action del form del log in per specificare il fatto che il sia un partecipante
+                        //e non un manager
+                        request.setAttribute("login", "survey?n=" + survey.getId());
                         request.setAttribute("survey", survey);
-                        request.setAttribute("page_title", "Login");                    
+                        request.setAttribute("page_title", "Login");
+                        res.activate("login.ftl.html", request, response);
                     }else{                   
                         request.setAttribute("page_title", survey.getTitle());
                         request.setAttribute("survey", survey);
+                        res.activate("survey.ftl.html", request, response);
                     }
-                }
-                res.activate("survey.ftl.html", request, response);
+                }                
             } else {                 
                 request.setAttribute("message", "Unable to load survey");
                 action_error(request, response);
@@ -104,26 +111,37 @@ public class SurveyController extends PollWebBaseController {
     }
     
     private void action_send_survey (HttpServletRequest request, HttpServletResponse response, int n) throws IOException, ServletException, TemplateManagerException {
+        TemplateResult res = new TemplateResult(getServletContext());
         SurveyResponse surveyResponse = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyResponseDAO().createSurveyResponse();
+        //lista che salva le risposte date, utilizzata in caso di errore per riempire i campi vuoti
+        //e per il racap terminata la compilazzione
         List<Answer> answers = new ArrayList<>();
+        //lista che immagazzina gli errori riscontrati durante l'invio della risposta
         List<String> error = new ArrayList<>();
+        //variabile per il controllo dell'errore sul numero delle scelte in una domanda a scelta
         boolean choiceController = true;
+        //variabile per il controllo dell'errone sull'obbligatorietà della domanda
         boolean mandatoryController= true;
         try{
             SurveyDAO dao = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyDAO();
             Survey survey = dao.findByIdOpen(n);
             surveyResponse.setSurvey(survey);
             AnswerDAO anseswerDao = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getAnswerDAO();
+            //for per creare una risposta a ogni domanda
             for (Question question: survey.getQuestions()){
-                if (question.isMandatory() && (request.getParameter(question.getCode()) == null || request.getParameter(question.getCode()).equals(""))){
+                //verifica che una domanda obbligatoria venga riempita
+                //se no imposta il controller a falso e aggiunge un errore alla lista
+                if (question.isMandatory() && (request.getParameter(question.getCode()) == null || request.getParameter(question.getCode()).isEmpty())){
                     mandatoryController = false;
                     error.add("This question is mandatory!");
                 } else {
                     error.add(null);
                 }
-                if (request.getParameter(question.getCode()) != null && (! request.getParameter(question.getCode()).equals("")) ) {
+                //verifica che la domanda abbia una risposta
+                if (request.getParameter(question.getCode()) != null && (!request.getParameter(question.getCode()).isEmpty()) ) {
                     String text = request.getParameter(question.getCode());
                     Answer answer = null;
+                    //caso domanda di tipo scelta
                     if (question instanceof ChoiceQuestion) {
                         ChoiceQuestion cq = (ChoiceQuestion) question;
                         ChoiceAnswer ca = anseswerDao.createChoiceAnswer();
@@ -135,14 +153,17 @@ public class SurveyController extends PollWebBaseController {
                              choiceController=false;
                             request.setAttribute("error_Number", answers.size());                          
                         }
+                        //caso domanda di tipo data
                     } else if (question instanceof DateQuestion) {
                         DateAnswer da = anseswerDao.createDateAnswer();
                         da.setAnswer(LocalDate.parse(text));
                         answer = da;
+                        //caso domanda di tipo numerico
                     } else if (question instanceof NumberQuestion) {
                         NumberAnswer na = anseswerDao.createNumberAnswer();
                         na.setAnswer(Float.valueOf(text));
                         answer = na;
+                        //caso domanda di tipo testo
                     } else if (question instanceof TextQuestion){
                         if(question instanceof ShortTextQuestion){
                             ShortTextAnswer ta = anseswerDao.createShortTextAnswer();
@@ -154,6 +175,7 @@ public class SurveyController extends PollWebBaseController {
                             answer = ta;
                         }
                     }
+                    //se la domanda aggiunte non è null, aggiungila alla riposta del sondaggio
                     if (answer != null){
                         answer.setQuestion(question);
                         surveyResponse.getAnswers().add(answer);
@@ -164,17 +186,22 @@ public class SurveyController extends PollWebBaseController {
                 }
             }
             request.setAttribute("answer", answers);
+            //controllo sulle scelte di una domanda a scelta
             if (choiceController){
+                //controllo se tutte le risposte obbligatorie hanno una risposta
                 if(mandatoryController){
+                    //verifica che tutte le risposte date siano valide
                     if(surveyResponse.isValid()){
-                    SurveyResponseDAO srdao = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyResponseDAO();
-                    srdao.saveOrUpdate(surveyResponse, n);
-                    request.setAttribute("send", "");
-                    if(request.getSession().getAttribute("p") != null){
-                        Participant p = (Participant) request.getSession().getAttribute("p");
-                        p.setSubmitted(true);
-                        ((Pollweb_DataLayer) request.getAttribute("datalayer")).getParticipantDAO().saveOrUpdate(p,n);
-                    }
+                        //salvataggio risposta
+                        SurveyResponseDAO srdao = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyResponseDAO();
+                        srdao.saveOrUpdate(surveyResponse, n);
+                        request.setAttribute("send", "");
+                        //se un partecipante è loggato allora salvare il fatto che ha risposto al sondaggio
+                        if(request.getSession().getAttribute("p") != null){
+                            Participant p = (Participant) request.getSession().getAttribute("p");
+                            p.setSubmitted(true);
+                            ((Pollweb_DataLayer) request.getAttribute("datalayer")).getParticipantDAO().saveOrUpdate(p,n);
+                        }
                     } else{
                         request.setAttribute("message", "Invalid Value");
                         action_error(request, response);
@@ -185,6 +212,9 @@ public class SurveyController extends PollWebBaseController {
             }else{
                 request.setAttribute("too_much", "Sellect more o less choice");
             }
+            request.setAttribute("page_title", survey.getTitle());
+            request.setAttribute("survey", survey);
+            res.activate("survey.ftl.html", request, response);
         } catch (Exception ex) {
             request.setAttribute("message", "Data access exception: " + ex.getMessage());
             action_error(request, response);
@@ -193,30 +223,49 @@ public class SurveyController extends PollWebBaseController {
         }
     }
     
+    //autenticazione in caso di sondaggio riservato
     private void action_autentication(HttpServletRequest request, HttpServletResponse response, int n) throws IOException, ServletException, TemplateManagerException {
+        TemplateResult res = new TemplateResult(getServletContext());
         String email = request.getParameter("email");
         String password = request.getParameter("password");
+        //verifica che i campi siano inseriti
         if (email != null && password != null) {
             try{
                 SurveyDAO dao =((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyDAO();
                 ReservedSurvey survey = (ReservedSurvey)dao.findByIdOpen(n);
+                //verifica se il sondaggio scelto esista
                 if (survey != null) {
+                    //verifica se il partecipante è presente tra quelli a cui è
+                    //permesso accedere al sondaggio scelto
                     for(Participant p: survey.getParticipants()){
                         if((p.getEmail()).equals(email) && (p.getPassword()).equals(password)){
+                            //verifica che il partecipante non abbia ancora risposto
                             if (p.isSubmitted()){
                                 request.setAttribute("error_autentication", "You have already answered!");
+                                request.setAttribute("login", "survey?n=" + survey.getId());
+                                request.setAttribute("survey", survey);
+                                request.setAttribute("page_title", "Login");
+                                res.activate("login.ftl.html", request, response);
                             } else {
                                 request.getSession().setAttribute("p", p);
                                 request.setAttribute("p", p);
+                                request.setAttribute("page_title", survey.getTitle());
+                                request.setAttribute("survey", survey);
+                                res.activate("survey.ftl.html", request, response);
                             }
                         }
                     }
+                    //verifica se l'autenticazione sia andata a buon fine
                     if (request.getSession().getAttribute("p") == null && request.getAttribute("error_autentication") == null){
                         request.setAttribute("error_autentication", "Incorrect credentials!");
+                        request.setAttribute("login", "survey?n=" + survey.getId());
+                        request.setAttribute("survey", survey);
+                        request.setAttribute("page_title", "Login");
+                        res.activate("login.ftl.html", request, response);
                     }
                     
                 } else {
-                    request.setAttribute("login_error", "Incorrect credentials");
+                    request.setAttribute("error", "Not a reserved survey!");
                     action_survey(request, response,n);
                 }
             } catch (Exception ex) {
@@ -231,6 +280,7 @@ public class SurveyController extends PollWebBaseController {
         int n;
         try {           
             HttpSession s = SecurityLayer.checkSession(request);
+            //gestore del logout di un revisore o dell'admin
             if (s != null){               
                 if(request.getParameter("logout") != null){
                     SecurityLayer.disposeSession(request);
@@ -241,11 +291,13 @@ public class SurveyController extends PollWebBaseController {
                 n = SecurityLayer.checkNumeric(request.getParameter("n"));
                 if(request.getParameter("login") != null){                    
                     action_autentication(request, response, n);
-                }
-                if (request.getParameter("send") != null) {
-                    action_send_survey(request, response, n);
-                }
-                action_survey(request, response, n);          
+                } else {
+                    if (request.getParameter("send") != null) {
+                        action_send_survey(request, response, n);
+                    } else {
+                        action_survey(request, response, n);
+                    }
+                }          
             }else{
                 action_survey_list(request, response);
             }

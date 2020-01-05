@@ -10,7 +10,7 @@ import it.univaq.f4i.iw.pollweb.data.impl.OptionImpl;
 
 /**
  *
- * @author Pagliarini Alberto
+ * @author Pagliarini Andrea
  */
 public class OptionProxy extends OptionImpl{
     private DataLayer dataLayer;

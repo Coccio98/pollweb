@@ -1,6 +1,10 @@
 <#if (survey??)>
-    <h1>${survey.getTitle()}</h1>
-    <h2>${survey.getOpeningText()}</h2>
+    <form action="my_surveys?m=${survey.getId()}" method="post">
+        <h1>Title: <input type="text" name="title" class="medium" value="${survey.getTitle()}"/></h1>
+        <h2>Opening Text: <input type="text" name="openT" class="medium" value="${survey.getOpeningText()}"/></h2>
+        <h2>Closing Text: <input type="text" name="closeT" class="medium" value="${survey.getClosingText()}"/></h2>
+        <input type="submit" name="saveSurvey" value="Save" class="medium"/>
+    </form>
     <#if (survey.isReserved())>
         <h3><li>
             Reserved Survey
@@ -76,7 +80,6 @@
             </tr>
         </#list>     
     </table>
-    <h2>${survey.getClosingText()}</h2>
     <div class="plus">
         <img src="images/plus.svg" alt="add" title="Add Question" class="imgButton add" onclick="location.href='my_surveys?a=${survey.getId()}'" />
     </div>

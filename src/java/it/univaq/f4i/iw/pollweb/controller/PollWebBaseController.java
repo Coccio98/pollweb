@@ -34,6 +34,8 @@ public abstract class PollWebBaseController extends HttpServlet {
             datalayer = new Pollweb_DataLayer(dataSource);
             datalayer.init();
             request.setAttribute("datalayer", datalayer);
+            //Se un revisore o un admin ha effettuato il login, si creano gli attributi da usare
+            //nell'outline per mostrare l'email/usename e per fare un controllo sul tipo
             if (request.getSession().getAttribute("username") != null) {
                 request.setAttribute("username", request.getSession().getAttribute("username"));
                 request.setAttribute("userType", request.getSession().getAttribute("type"));

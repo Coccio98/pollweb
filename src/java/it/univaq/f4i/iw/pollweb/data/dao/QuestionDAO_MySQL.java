@@ -282,12 +282,8 @@ public class QuestionDAO_MySQL extends DAO implements QuestionDAO {
                 // 1    2      3        4     5        6        7        8         9          10     11      12
                 //text,note,mandatory,type,min_date,max_date,min_value,max_value,reg_expr,id_survey,position,code
                 iQuestion.setString(1, question.getText());
-                iQuestion.setString(2, question.getNote());
-                if(question.isMandatory()){
-                    iQuestion.setString(3, "1");
-                }else{
-                    iQuestion.setString(3, "0");
-                }
+                iQuestion.setString(2, question.getNote());                
+                iQuestion.setBoolean(3, question.isMandatory());               
                 iQuestion.setShort(11, question.getPosition());
                 String code = surveyId + question.getQuestionType().charAt(0)+","+question.getId()+","+ question.getPosition();
                 iQuestion.setString(12, code);
@@ -352,11 +348,7 @@ public class QuestionDAO_MySQL extends DAO implements QuestionDAO {
             //text=?,note=?,mandatory=?,type=?,min_date=?,max_date=?,min_value=?,max_value=?,reg_expr=?,position=?,code=? WHERE id=?
             uQuestion.setString(1, question.getText());
             uQuestion.setString(2, question.getNote());
-            if(question.isMandatory()){
-                uQuestion.setString(3, "1");
-            }else{
-                uQuestion.setString(3, "0");
-            }
+            uQuestion.setBoolean(3, question.isMandatory());          
             uQuestion.setString(4, question.getQuestionType());
             uQuestion.setString(5, "1-1-1");
             uQuestion.setString(6, "1-1-1");

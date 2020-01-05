@@ -11,7 +11,7 @@ import java.time.LocalDate;
 
 /**
  *
- * @author Pagliarini Alberto
+ * @author Pagliarini Andrea
  */
 public class DateQuestionProxy extends DateQuestionImpl {
     

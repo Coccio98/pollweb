@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Pagliarini Andrea
  */
-public class LoginController extends PollWebBaseController {
+public class UserLogin extends PollWebBaseController {
     
     private void action_error(HttpServletRequest request, HttpServletResponse response) {
         if (request.getAttribute("exception") != null) {
@@ -31,18 +31,21 @@ public class LoginController extends PollWebBaseController {
         }
     }
     
+    //autenticazione del manager o dell'admin
     private void action_autentication(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException, TemplateManagerException {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
+        //controllo che i campi siano inseriti
         if (email != null && password != null) {
             try{
                 UserDAO dao = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getUserDAO();
                 User user = dao.findByEmailAndPassword(email,password);
+                //verifica che l'utente essita
                 if (user != null) {
                     SecurityLayer.createSession(request, email, user.getId(), user.getType());
                     response.sendRedirect("survey");
                 } else {
-                    request.setAttribute("login_error", "Incorrect credentials");
+                    request.setAttribute("error_autentication", "Incorrect credentials");
                     action_default(request, response);
                 }
             } catch (Exception ex) {
@@ -53,9 +56,11 @@ public class LoginController extends PollWebBaseController {
     
     }
     
+    //apre la schermata di login
     private void action_default(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException, TemplateManagerException {
         try {
                 TemplateResult res = new TemplateResult(getServletContext());
+                request.setAttribute("login", "login");
                 request.setAttribute("page_title", "Login");
                 res.activate("login.ftl.html", request, response);
         } catch (Exception ex) {
@@ -69,6 +74,11 @@ public class LoginController extends PollWebBaseController {
     @Override
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
+            //se un partecipante dovesse essere loggato quando si trova in questo punto viene fatto il log out del suddetto
+            if(request.getSession().getAttribute("p") != null){
+                request.getSession().removeAttribute("p");
+            }
+            //controllo se un manager NON ha effettuato un login
             if(SecurityLayer.checkSession(request) == null){            
                 if (request.getParameter("email") != null && request.getParameter("password") != null) {
                     action_autentication(request, response);

@@ -7,7 +7,7 @@ package it.univaq.f4i.iw.pollweb.data.model;
 
 /**
  *
- * @author Pagliarini Alberto
+ * @author Pagliarini Andrea
  */
 public interface NumberQuestion extends Question{
     

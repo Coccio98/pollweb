@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  *
- * @author Pagliarini Alberto
+ * @author Pagliarini Andrea
  */
 public interface SurveyResponse {
     

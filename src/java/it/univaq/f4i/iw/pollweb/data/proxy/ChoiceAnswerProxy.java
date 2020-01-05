@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Pagliarini Alberto
+ * @author Pagliarini Andrea
  */
 public class ChoiceAnswerProxy extends ChoiceAnswerImpl{
     private DataLayer dataLayer;

@@ -46,7 +46,7 @@ public class SurveyDAO_MySQL extends DAO implements SurveyDAO {
                     + " (title,opening_text,closing_text,open,reserved,id_manager) "
                     + "VALUES (?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
             this.uSurvey = this.connection.prepareStatement("UPDATE surveys SET "
-                    + "title=?,opening_text=?,closing_text=?,open=?,reserved=?"
+                    + "title=?,opening_text=?,closing_text=?,open=?,reserved=? "
                     + "WHERE id=?");
             this.dSurvey = this.connection.prepareStatement("DELETE FROM sondaggio WHERE id=?");
         } catch(SQLException ex) {
@@ -199,18 +199,15 @@ public class SurveyDAO_MySQL extends DAO implements SurveyDAO {
 
     @Override
     public void saveOrUpdate(Survey survey) throws DataException {
+        //title,opening_text,closing_text,open,reserved,id_manager
         if(survey.getId() == 0){
             ResultSet rs = null;
             try {
                 iSurvey.setString(1, survey.getTitle());
                 iSurvey.setString(2, survey.getOpeningText());
                 iSurvey.setString(3, survey.getClosingText());
-                iSurvey.setString(4, "0");
-                if(survey.isReserved()){
-                    iSurvey.setString(5, "1");
-                } else {
-                    iSurvey.setString(5, "0");
-                }
+                iSurvey.setBoolean(4, false);
+                iSurvey.setBoolean(5, survey.isReserved());               
                 iSurvey.setLong(6, survey.getManager().getId());
                 if (iSurvey.executeUpdate() == 0) {
                     System.out.println(iSurvey.toString());
@@ -226,17 +223,9 @@ public class SurveyDAO_MySQL extends DAO implements SurveyDAO {
             try {
                 uSurvey.setString(1, survey.getTitle());
                 uSurvey.setString(2, survey.getOpeningText());
-                uSurvey.setString(3, survey.getClosingText());
-                if(survey.isActive()){
-                    uSurvey.setString(4, "1");
-                } else {
-                    uSurvey.setString(4, "0");
-                }
-                if(survey.isReserved()){
-                    uSurvey.setString(5, "1");
-                } else {
-                    uSurvey.setString(5, "0");
-                }
+                uSurvey.setString(3, survey.getClosingText());               
+                uSurvey.setBoolean(4, survey.isActive());               
+                uSurvey.setBoolean(5, survey.isReserved());              
                 uSurvey.setLong(6, survey.getId());
                 uSurvey.executeUpdate();
             }catch (SQLException ex) {
