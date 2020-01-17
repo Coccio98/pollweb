@@ -37,9 +37,62 @@
             <#break>
             <#case "date">
                 <h3>Max Date</h3>
-                <input type="date" name="maxValue" min="0001-01-01" class="medium" value="${question.getMaxDate()}"/>
+                <h4>mm/dd/yyyy</h4>
+                <select name="maxValue" class="small" >
+                    <#list 1..12 as month>
+                    <option value="#{month}"
+                            <#if (month==question.getMaxDate().getMonthValue())>
+                            selected="selected"
+                            </#if>
+                            >#{month}</option>
+                    </#list>
+                </select>/
+                <select name="maxValue" class="small" >
+                    <#list 1..31 as day>
+                    <option value="#{day}"
+                            <#if (day==question.getMaxDate().getDayOfMonth())>
+                            selected="selected"
+                            </#if>
+                            >#{day}</option>
+                    </#list>
+                </select>/                        
+                <select name="maxValue" class="small" >
+                    <#list 1..9999 as year>
+                    <option value="#{year}"
+                            <#if (year==question.getMaxDate().getYear())>
+                            selected="selected"
+                            </#if>
+                            >#{year}</option>
+                    </#list>  
+                </select>
                 <h3>Min Date</h3>
-                <input type="date" name="minValue" min="0001-01-01" class="medium" value="${question.getMinDate()}"/>
+                <h4>mm/dd/yyyy</h4>
+                <select name="minValue" class="small" >
+                    <#list 1..12 as month>
+                    <option value="#{month}"
+                            <#if (month==question.getMinDate().getMonthValue())>
+                            selected="selected"
+                            </#if>
+                            >#{month}</option>
+                    </#list>
+                </select>/
+                <select name="minValue" class="small" >
+                    <#list 1..31 as day>
+                    <option value="#{day}"
+                            <#if (day==question.getMinDate().getDayOfMonth())>
+                            selected="selected"
+                            </#if>>#{day}</option>
+                    </#list>
+                </select>/                        
+                <select name="minValue" class="small" >
+                    <#list 1..9999 as year>
+                    <option value="#{year}"
+                            <#if (year==question.getMinDate().getYear())>
+                            selected="selected"
+                            </#if>
+                            >#{year}</option>
+                    </#list>  
+                </select>
             <#break>
             <#case "choice">
                 <table width="40%" class="row">

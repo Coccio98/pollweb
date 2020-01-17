@@ -14,22 +14,27 @@ import java.util.regex.Pattern;
  * @author andrea
  */
 public class ShortTextAnswerImpl extends TextAnswerImpl implements ShortTextAnswer{
-
+    
+    @Override
+    public boolean matchPattern(){
+        ShortTextQuestion question =(ShortTextQuestion) this.getQuestion();
+        if (!(question.getPattern().equals(".")) &&
+                !(Pattern.matches(question.getPattern(), getAnswer()))) {
+            return false;
+        }
+        return true;
+    }
+    
     @Override
     public boolean isValid() {
         if(this.getQuestion()!= null && (this.getQuestion() instanceof ShortTextQuestion)){
-            ShortTextQuestion question =(ShortTextQuestion) this.getQuestion();
-        
+            ShortTextQuestion question =(ShortTextQuestion) this.getQuestion();        
             if((question.getMaxLength()!= 0) && (
                     getAnswer().length() > question.getMaxLength())){
                 return false;       
             }
             if((question.getMinLength()!= 0) && (
                     getAnswer().length() < question.getMinLength())){
-                return false;
-            }
-            if (!(question.getPattern().equals(".")) &&
-                    !(Pattern.matches(question.getPattern(), question.getText()))) {
                 return false;
             }
         } else {

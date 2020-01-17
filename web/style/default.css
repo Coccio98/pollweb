@@ -301,6 +301,9 @@ h5 {
         width: 100%;
         font-size: 10px;
     }
+    select.small{
+        width: auto;
+    }
     .imgButton{
         transform: scale(0.8, 0.8);
         -ms-transform: scale(0.8, 0.8); /* IE 9 */

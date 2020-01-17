@@ -6,7 +6,7 @@
 <#if (survey.getQuestions()?size > 0)>
     <form action="survey" method="post">
         <#if p??>
-            ${p.getName()}
+            <h2>${p.getName()}</h2>
         </#if>
         <input type="hidden" name="n" value="${survey.id}">
         <#list survey.getQuestions() as question>
@@ -77,40 +77,106 @@
                     </#if>
                 </#if>
                 <#if question.getQuestionType() == "short text">
-                    <#if answer?? && answer[question?index]??>
-                        <#if question.getMaxLength() != 0>
-                            <input type="text" name=${question.getCode()} class="medium" maxlength=#{question.getMaxLength()} minlength=#{question.getMinLength()} value="${answer[question?index].getAnswer()}">
-                        <#else>
-                            <input type="text" name=${question.getCode()} class="medium" minlength=#{question.getMinLength()} value="${answer[question?index].getAnswer()}">
-                        </#if>
-                    <#else>
-                        <#if question.getMaxLength() != 0>
-                            <input type="text" name=${question.getCode()} class="medium" maxlength=#{question.getMaxLength()} minlength=#{question.getMinLength()}>
-                        <#else>
-                            <input type="text" name=${question.getCode()} class="medium" minlength=#{question.getMinLength()}>
-                        </#if>
+                    <#if answer?? && answer[question?index]??>                        
+                        <input type="text" name=${question.getCode()} class="medium" maxlength=#{question.getMaxLength()} minlength=#{question.getMinLength()} value="${answer[question?index].getAnswer()}">                       
+                    <#else>                        
+                        <input type="text" name=${question.getCode()} class="medium" maxlength=#{question.getMaxLength()} minlength=#{question.getMinLength()}>                   
                     </#if>
                 </#if>
                 <#if question.getQuestionType() == "long text">
-                    <#if answer?? && answer[question?index]??>
-                        <#if question.getMaxLength() != 0>
-                            <textarea name=${question.getCode()} maxlength=#{question.getMaxLength()} minlength=#{question.getMinLength()}>${answer[question?index].getAnswer()}</textarea>
-                        <#else>
-                            <textarea name=${question.getCode()} minlength=#{question.getMinLength()}>${answer[question?index].getAnswer()}</textarea>
-                        </#if>
-                    <#else>
-                        <#if question.getMaxLength() != 0>
-                            <textarea name=${question.getCode()} maxlength=#{question.getMaxLength()} minlength=#{question.getMinLength()}></textarea>
-                        <#else>
-                            <textarea name=${question.getCode()} minlength=#{question.getMinLength()}></textarea>
-                        </#if>
+                    <#if answer?? && answer[question?index]??>                      
+                        <textarea name=${question.getCode()} maxlength=#{question.getMaxLength()} minlength=#{question.getMinLength()}>${answer[question?index].getAnswer()}</textarea>                      
+                    <#else>   
+                        <textarea name=${question.getCode()} maxlength=#{question.getMaxLength()} minlength=#{question.getMinLength()}></textarea>                        
                     </#if>
                 </#if>
                 <#if question.getQuestionType() == "date">
                     <#if answer?? && answer[question?index]??>
-                        <input type="date" name=${question.getCode()} class="medium" max=${question.getMaxDate()} min=${question.getMinDate()} value="${answer[question?index].getAnswer()}">
+                        <h4>mm/dd/yyyy</h4>
+                        <select name="${question.getCode()}" class="small" >
+                            <option value=""></option>
+                            <#if question.getMinDate().getYear()==question.getMaxDate().getYear()>
+                                <#list question.getMinDate().getMonthValue()..question.getMaxDate().getMonthValue() as month>
+                                <option value="#{month}"
+                                        <#if (month==answer[question?index].getAnswer().getMonthValue())>
+                                        selected="selected"
+                                        </#if>
+                                        >#{month}</option>
+                                </#list>
+                            <#else>                        
+                                <#list 1..12 as month>
+                                <option value="#{month}"
+                                        <#if (month==answer[question?index].getAnswer().getMonthValue())>
+                                        selected="selected"
+                                        </#if>
+                                        >#{month}</option>
+                                </#list>                         
+                            </#if>
+                        </select>/
+                        <select name="${question.getCode()}" class="small" >
+                            <option value=""></option>
+                            <#if question.getMinDate().getYear()==question.getMaxDate().getYear() &&
+                            question.getMinDate().getMonthValue()==question.getMaxDate().getMonthValue()>
+                                <#list question.getMinDate().getDayOfMonth()..question.getMaxDate().getDayOfMonth() as day>
+                                <option value="#{day}" 
+                                        <#if (day==answer[question?index].getAnswer().getDayOfMonth())>
+                                        selected="selected"
+                                        </#if>
+                                        >#{day}</option>
+                                </#list>
+                            <#else>    
+                                <#list 1..31 as day>
+                                <option value="#{day}"
+                                        <#if (day==answer[question?index].getAnswer().getDayOfMonth())>
+                                        selected="selected"
+                                        </#if>
+                                        >#{day}</option>
+                                </#list>
+                            </#if>
+                        </select>/
+                        <select name="${question.getCode()}" class="small" >
+                            <option value=""></option>
+                            <#list question.getMinDate().getYear()..question.getMaxDate().getYear() as year>
+                            <option value="#{year}"
+                                    <#if (year==answer[question?index].getAnswer().getYear())>
+                                    selected="selected"
+                                    </#if>
+                                    >#{year}</option>
+                            </#list>  
+                        </select>
                     <#else>
-                        <input type="date" name=${question.getCode()} class="medium" max=${question.getMaxDate()} min=${question.getMinDate()}>
+                        <h4>mm/dd/yyyy</h4>
+                        <select name="${question.getCode()}" class="small" >
+                            <option value=""></option>
+                            <#if question.getMinDate().getYear()==question.getMaxDate().getYear()>
+                                <#list question.getMinDate().getMonthValue()..question.getMaxDate().getMonthValue() as month>
+                                <option value="#{month}">#{month}</option>
+                                </#list>
+                            <#else>                        
+                                <#list 1..12 as month>
+                                <option value="#{month}">#{month}</option>
+                                </#list>                         
+                            </#if>
+                        </select>/
+                        <select name="${question.getCode()}" class="small" >
+                            <option value=""></option>
+                            <#if question.getMinDate().getYear()==question.getMaxDate().getYear() &&
+                            question.getMinDate().getMonthValue()==question.getMaxDate().getMonthValue()>
+                                <#list question.getMinDate().getDayOfMonth()..question.getMaxDate().getDayOfMonth() as day>
+                                <option value="#{day}">#{day}</option>
+                                </#list>
+                            <#else>
+                                <#list 1..31 as day>
+                                <option value="#{day}">#{day}</option>
+                                </#list>
+                            </#if>
+                        </select>/                        
+                        <select name="${question.getCode()}" class="small" >
+                            <option value=""></option>
+                            <#list question.getMinDate().getYear()..question.getMaxDate().getYear() as year>
+                            <option value="#{year}">#{year}</option>
+                            </#list>  
+                        </select>
                     </#if>
                 </#if>
 

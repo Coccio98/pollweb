@@ -11,6 +11,8 @@ package it.univaq.f4i.iw.pollweb.data.model;
  */
 public interface ShortTextAnswer extends TextAnswer{
     
+    boolean matchPattern();
+    
     @Override
     boolean isValid();
     

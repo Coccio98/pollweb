@@ -117,11 +117,9 @@ public class SurveyAndResponse extends PollWebBaseController {
         //e per il racap terminata la compilazzione
         List<Answer> answers = new ArrayList<>();
         //lista che immagazzina gli errori riscontrati durante l'invio della risposta
-        List<String> error = new ArrayList<>();
-        //variabile per il controllo dell'errore sul numero delle scelte in una domanda a scelta
-        boolean choiceController = true;
-        //variabile per il controllo dell'errone sull'obbligatorietà della domanda
-        boolean mandatoryController= true;
+        List<String> errors = new ArrayList<>();
+        //variabile per il controllo dell'errone della domanda
+        boolean errorController= true;
         try{
             SurveyDAO dao = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyDAO();
             Survey survey = dao.findByIdOpen(n);
@@ -132,13 +130,17 @@ public class SurveyAndResponse extends PollWebBaseController {
                 //verifica che una domanda obbligatoria venga riempita
                 //se no imposta il controller a falso e aggiunge un errore alla lista
                 if (question.isMandatory() && (request.getParameter(question.getCode()) == null || request.getParameter(question.getCode()).isEmpty())){
-                    mandatoryController = false;
-                    error.add("This question is mandatory!");
+                    errorController = false;
+                    errors.add("This question is mandatory!");
                 } else {
-                    error.add(null);
+                    errors.add(null);
                 }
                 //verifica che la domanda abbia una risposta
-                if (request.getParameter(question.getCode()) != null && (!request.getParameter(question.getCode()).isEmpty()) ) {
+                if ((request.getParameter(question.getCode()) != null && !request.getParameter(question.getCode()).isEmpty()) ||
+                        (request.getParameterValues(question.getCode()).length>1 && request.getParameterValues(question.getCode())[1]!=null 
+                        && !request.getParameterValues(question.getCode())[1].isEmpty())||
+                        (request.getParameterValues(question.getCode()).length>2 && request.getParameterValues(question.getCode())[2]!=null 
+                        && !request.getParameterValues(question.getCode())[2].isEmpty())) {
                     String text = request.getParameter(question.getCode());
                     Answer answer = null;
                     //caso domanda di tipo scelta
@@ -146,38 +148,79 @@ public class SurveyAndResponse extends PollWebBaseController {
                         ChoiceQuestion cq = (ChoiceQuestion) question;
                         ChoiceAnswer ca = anseswerDao.createChoiceAnswer();
                         for (String s: request.getParameterValues(question.getCode())) {
-                                ca.getOptions().add(cq.getOption(Short.valueOf(s)));
-                            }
-                            answer = ca;
-                        if (!((cq.getMaxNumberOfChoices()== 0 || request.getParameterValues(question.getCode()).length <= cq.getMaxNumberOfChoices()) && request.getParameterValues(question.getCode()).length >= cq.getMinNumberOfChoices())) {
-                             choiceController=false;
-                            request.setAttribute("error_Number", answers.size());                          
+                            ca.getOptions().add(cq.getOption(Short.valueOf(s)));
+                        }
+                        answer = ca;
+                        answer.setQuestion(cq);
+                        if (!answer.isValid()) {                          
+                            errorController = false;
+                            errors.set(errors.size()-1, "Select between " + cq.getMaxNumberOfChoices() + " and " + cq.getMinNumberOfChoices() + " choices!");                                                                                     
                         }
                         //caso domanda di tipo data
                     } else if (question instanceof DateQuestion) {
+                        DateQuestion dq = (DateQuestion)question;
                         DateAnswer da = anseswerDao.createDateAnswer();
-                        da.setAnswer(LocalDate.parse(text));
-                        answer = da;
+                        String date[] =  request.getParameterValues(question.getCode());
+                        String dateText = "";
+                        if (date.length==3 && !date[0].isEmpty() && !date[1].isEmpty() && !date[2].isEmpty()){
+                            dateText=String.format("%04d", SecurityLayer.checkNumeric(date[2]))+
+                                    "-"+String.format("%02d", SecurityLayer.checkNumeric(date[0]))+
+                                    "-"+String.format("%02d", SecurityLayer.checkNumeric(date[1]));
+                        }
+                        try{
+                            da.setAnswer(LocalDate.parse(dateText));
+                            answer = da;
+                            answer.setQuestion(dq);
+                            if (!answer.isValid()) {                               
+                                errorController = false;
+                                errors.set(errors.size()-1, "Select between " + dq.getMaxDate() + " and " + dq.getMinDate() + "!");                                                          
+                            }
+                        }catch(Exception ex){
+                            answers.add(null);
+                            errorController = false;
+                            errors.set(errors.size()-1, "Invalid Date");
+                        }
                         //caso domanda di tipo numerico
                     } else if (question instanceof NumberQuestion) {
+                        NumberQuestion nq = (NumberQuestion)question;
                         NumberAnswer na = anseswerDao.createNumberAnswer();
                         na.setAnswer(Float.valueOf(text));
                         answer = na;
+                        answer.setQuestion(nq);
+                        if (!answer.isValid()) {                           
+                            errorController = false;
+                            errors.set(errors.size()-1, "Select between " + nq.getMaxValue() + " and " + nq.getMinValue() + "!");                                                         
+                        }
                         //caso domanda di tipo testo
                     } else if (question instanceof TextQuestion){
                         if(question instanceof ShortTextQuestion){
+                            ShortTextQuestion tq = (ShortTextQuestion)question;
                             ShortTextAnswer ta = anseswerDao.createShortTextAnswer();
                             ta.setAnswer(text);
                             answer = ta;
+                            answer.setQuestion(tq);
+                            if (!answer.isValid()) {
+                                errorController = false;
+                                errors.set(errors.size()-1, "Write between " + tq.getMaxLength() + " and " + tq.getMinLength() + " characters!");                                                                                        
+                            }
+                            if (!((ShortTextAnswer)answer).matchPattern()){
+                                errorController = false;
+                                errors.set(errors.size()-1, "Doesn't match the pattern!");
+                            }
                         } else {
+                            TextQuestion tq = (TextQuestion)question;
                             TextAnswer ta = anseswerDao.createTextAnswer();
                             ta.setAnswer(text);
                             answer = ta;
+                            answer.setQuestion(tq);
+                            if (!answer.isValid()) {
+                                errorController = false;
+                                errors.set(errors.size()-1, "Write between " + tq.getMaxLength() + " and " + tq.getMinLength() + " characters!");                                                          
+                            }
                         }
                     }
                     //se la domanda aggiunte non è null, aggiungila alla riposta del sondaggio
                     if (answer != null){
-                        answer.setQuestion(question);
                         surveyResponse.getAnswers().add(answer);
                         answers.add(answer);
                     }
@@ -186,31 +229,26 @@ public class SurveyAndResponse extends PollWebBaseController {
                 }
             }
             request.setAttribute("answer", answers);
-            //controllo sulle scelte di una domanda a scelta
-            if (choiceController){
-                //controllo se tutte le risposte obbligatorie hanno una risposta
-                if(mandatoryController){
-                    //verifica che tutte le risposte date siano valide
-                    if(surveyResponse.isValid()){
-                        //salvataggio risposta
-                        SurveyResponseDAO srdao = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyResponseDAO();
-                        srdao.saveOrUpdate(surveyResponse, n);
-                        request.setAttribute("send", "");
-                        //se un partecipante è loggato allora salvare il fatto che ha risposto al sondaggio
-                        if(request.getSession().getAttribute("p") != null){
-                            Participant p = (Participant) request.getSession().getAttribute("p");
-                            p.setSubmitted(true);
-                            ((Pollweb_DataLayer) request.getAttribute("datalayer")).getParticipantDAO().saveOrUpdate(p,n);
-                        }
-                    } else{
-                        request.setAttribute("message", "Invalid Value");
-                        action_error(request, response);
+            //controllo se ci sono errori
+            if(errorController){
+                //verifica che tutte le risposte date siano valide
+                if(surveyResponse.isValid()){
+                    //salvataggio risposta
+                    SurveyResponseDAO srdao = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyResponseDAO();
+                    srdao.saveOrUpdate(surveyResponse, n);
+                    request.setAttribute("send", "");
+                    //se un partecipante è loggato allora salvare il fatto che ha risposto al sondaggio
+                    if(request.getSession().getAttribute("p") != null){
+                        Participant p = (Participant) request.getSession().getAttribute("p");
+                        p.setSubmitted(true);
+                        ((Pollweb_DataLayer) request.getAttribute("datalayer")).getParticipantDAO().saveOrUpdate(p,n);
                     }
-                } else {
-                    request.setAttribute("error", error);
+                } else{
+                    request.setAttribute("message", "Invalid Value");
+                    action_error(request, response);
                 }
-            }else{
-                request.setAttribute("too_much", "Sellect more o less choice");
+            } else {
+                request.setAttribute("error", errors);
             }
             request.setAttribute("page_title", survey.getTitle());
             request.setAttribute("survey", survey);

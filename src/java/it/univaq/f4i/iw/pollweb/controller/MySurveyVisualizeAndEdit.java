@@ -123,13 +123,18 @@ public class MySurveyVisualizeAndEdit extends PollWebBaseController {
                     questionDao.update(survey.getQuestions().get(down+1), m);
                 }
                 //eliminazione di una domanda nel sondaggio
-                if(request.getParameter("down") == null && request.getParameter("up") == null && request.getParameter("del") != null && !survey.getQuestions().isEmpty()){
-                    int del=SecurityLayer.checkNumeric(request.getParameter("del"));
-                    questionDao.delete(survey,del);
+                try{
+                    if(request.getParameter("down") == null && request.getParameter("up") == null && request.getParameter("del") != null && !survey.getQuestions().isEmpty()){
+                        int del=SecurityLayer.checkNumeric(request.getParameter("del"));
+                        questionDao.delete(survey,del);
+                    }               
+                    request.setAttribute("survey", (((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyDAO()).findById(m));
+                    request.setAttribute("page_title", "Edit Survey");
+                    res.activate("my_survey_detail.ftl.html", request, response);
+                } catch (Exception ex) {
+                    request.setAttribute("message", "You cannot delete a question if someone already answered");
+                    action_error(request, response);
                 }
-                request.setAttribute("survey", (((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyDAO()).findById(m));
-                request.setAttribute("page_title", "Edit Survey");
-                res.activate("my_survey_detail.ftl.html", request, response);
             } else {
                 request.setAttribute("message", "This is not your survey");
                 action_error(request, response);
@@ -376,17 +381,33 @@ public class MySurveyVisualizeAndEdit extends PollWebBaseController {
                                 //domanda di tipo data
                             case "date":
                                 //verifica della correttezza dei campi
-                                if(request.getParameter("maxValue") != null &&
-                                    request.getParameter("minValue") != null){
+                                if(request.getParameterValues("maxValue")!=null && 
+                                        request.getParameterValues("minValue")!=null){
+                                    String dateMax[] = request.getParameterValues("maxValue");
                                     //conntrollo sul campo data massima
-                                    if(!request.getParameter("maxValue").isEmpty()){
-                                        LocalDate localDate = LocalDate.parse(request.getParameter("maxValue"));
-                                        ((DateQuestion)question).setMaxDate(localDate);
+                                    if(dateMax.length==3 &&
+                                            !dateMax[0].isEmpty() &&
+                                            !dateMax[1].isEmpty() &&
+                                            !dateMax[2].isEmpty()){
+                                        try{
+                                            LocalDate localDate = LocalDate.parse(String.format("%04d", SecurityLayer.checkNumeric(dateMax[2]))+
+                                                "-"+String.format("%02d", SecurityLayer.checkNumeric(dateMax[0]))+
+                                                "-"+String.format("%02d", SecurityLayer.checkNumeric(dateMax[1])));
+                                            ((DateQuestion)question).setMaxDate(localDate);
+                                        }catch(Exception ex){}
                                     }
+                                    String dateMin[] = request.getParameterValues("minValue");
                                     //conntrollo sul campo data minima
-                                    if(!request.getParameter("minValue").isEmpty()){
-                                        LocalDate localDate = LocalDate.parse(request.getParameter("minValue"));
-                                        ((DateQuestion)question).setMinDate(localDate);
+                                    if(dateMin.length==3 &&
+                                            !dateMin[0].isEmpty() &&
+                                            !dateMin[1].isEmpty() &&
+                                            !dateMin[2].isEmpty()){
+                                        try{
+                                            LocalDate localDate = LocalDate.parse(String.format("%04d", SecurityLayer.checkNumeric(dateMin[2]))+
+                                                "-"+String.format("%02d", SecurityLayer.checkNumeric(dateMin[0]))+
+                                                "-"+String.format("%02d", SecurityLayer.checkNumeric(dateMin[1])));
+                                            ((DateQuestion)question).setMinDate(localDate);
+                                        }catch(Exception ex){}
                                     }
                                 }
                                 break;

@@ -290,30 +290,40 @@ public class SurveyCreator extends PollWebBaseController {
                         case "date":{                       
                             LocalDate localDateMax;
                             LocalDate localDateMin;
-                            //controllo sulla data massima
-                            if(!request.getParameter("maxValue").isEmpty()){
-                                localDateMax = LocalDate.parse(request.getParameter("maxValue"));                            
-                            } else {
-                                localDateMax = LocalDate.of(9999, Month.DECEMBER, 31);
-                            }
-                            //controllo sulla data minima
-                            if(!request.getParameter("minValue").isEmpty()){
-                                localDateMin = LocalDate.parse(request.getParameter("minValue"));                           
-                            } else {
-                                localDateMin = LocalDate.of(1, Month.JANUARY, 1);
-                            }
-                            //verifica che dateMin non sia dopo dateMax
-                            if(!(localDateMin.isAfter(localDateMax))){
-                                DateQuestion q = dao.createDateQuestion();
-                                q.setId(SecurityLayer.checkNumeric(request.getParameter("questionId")));
-                                q.setMaxDate(localDateMax);
-                                q.setMinDate(localDateMin);
-                                q.setPosition((short)SecurityLayer.checkNumeric(request.getParameter("position")));
-                                dao.newQuestion(q, SecurityLayer.checkNumeric(request.getParameter("surveyId")));
-                                request.setAttribute("page_title", "Add Question");
-                            } else {
-                                request.setAttribute("error_creation", "Max Date must be bigger than Min Date");
-                            }
+                            try{
+                                //controllo sulla data massima
+                                String dateMax[] =  request.getParameterValues("maxValue");
+                                String dateText = "";
+                                if (dateMax.length==3 && !dateMax[0].isEmpty() && !dateMax[1].isEmpty() && !dateMax[2].isEmpty()){
+                                    dateText=String.format("%04d", SecurityLayer.checkNumeric(dateMax[2]))+
+                                        "-"+String.format("%02d", SecurityLayer.checkNumeric(dateMax[0]))+
+                                        "-"+String.format("%02d", SecurityLayer.checkNumeric(dateMax[1]));
+                                }                            
+                                localDateMax = LocalDate.parse(dateText);
+                                //controllo sulla data minima
+                                String dateMin[] =  request.getParameterValues("minValue");
+                                dateText = "";
+                                if (dateMin.length==3 && !dateMin[0].isEmpty() && !dateMin[1].isEmpty() && !dateMin[2].isEmpty()){
+                                    dateText=String.format("%04d", SecurityLayer.checkNumeric(dateMin[2]))+
+                                        "-"+String.format("%02d", SecurityLayer.checkNumeric(dateMin[0]))+
+                                        "-"+String.format("%02d", SecurityLayer.checkNumeric(dateMin[1]));
+                                }                            
+                                localDateMin = LocalDate.parse(dateText);
+                                //verifica che dateMin non sia dopo dateMax
+                                if(!(localDateMin.isAfter(localDateMax))){
+                                    DateQuestion q = dao.createDateQuestion();
+                                    q.setId(SecurityLayer.checkNumeric(request.getParameter("questionId")));
+                                    q.setMaxDate(localDateMax);
+                                    q.setMinDate(localDateMin);
+                                    q.setPosition((short)SecurityLayer.checkNumeric(request.getParameter("position")));
+                                    dao.newQuestion(q, SecurityLayer.checkNumeric(request.getParameter("surveyId")));
+                                    request.setAttribute("page_title", "Add Question");
+                                } else {
+                                    request.setAttribute("error_creation", "Max Date must be bigger than Min Date");
+                                }
+                            }catch(Exception ex){
+                                request.setAttribute("error_creation", "Invalid Date");
+                            }                                                                                                        
                         }
                             break;
                             //domanda di tipo scelta

@@ -285,7 +285,7 @@ public class QuestionDAO_MySQL extends DAO implements QuestionDAO {
                 iQuestion.setString(2, question.getNote());                
                 iQuestion.setBoolean(3, question.isMandatory());               
                 iQuestion.setShort(11, question.getPosition());
-                String code = surveyId + question.getQuestionType().charAt(0)+","+question.getId()+","+ question.getPosition();
+                String code = Long.toString(surveyId) + question.getQuestionType().charAt(0)+","+question.getId()+","+ question.getPosition();
                 iQuestion.setString(12, code);
                 iQuestion.setString(4, question.getQuestionType());
                 iQuestion.setString(5, "1-1-1");
