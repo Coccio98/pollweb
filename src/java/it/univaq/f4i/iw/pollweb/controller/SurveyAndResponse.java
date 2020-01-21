@@ -5,6 +5,7 @@
  */
 package it.univaq.f4i.iw.pollweb.controller;
 
+import it.univaq.f4i.iw.framework.result.AdditionalFunctions;
 import it.univaq.f4i.iw.framework.result.FailureResult;
 import it.univaq.f4i.iw.framework.result.TemplateManagerException;
 import it.univaq.f4i.iw.framework.result.TemplateResult;
@@ -136,11 +137,12 @@ public class SurveyAndResponse extends PollWebBaseController {
                     errors.add(null);
                 }
                 //verifica che la domanda abbia una risposta
-                if ((request.getParameter(question.getCode()) != null && !request.getParameter(question.getCode()).isEmpty()) ||
+                if ((request.getParameter(question.getCode()) != null) && 
+                        (!request.getParameter(question.getCode()).isEmpty() ||
                         (request.getParameterValues(question.getCode()).length>1 && request.getParameterValues(question.getCode())[1]!=null 
                         && !request.getParameterValues(question.getCode())[1].isEmpty())||
                         (request.getParameterValues(question.getCode()).length>2 && request.getParameterValues(question.getCode())[2]!=null 
-                        && !request.getParameterValues(question.getCode())[2].isEmpty())) {
+                        && !request.getParameterValues(question.getCode())[2].isEmpty()))) {
                     String text = request.getParameter(question.getCode());
                     Answer answer = null;
                     //caso domanda di tipo scelta
@@ -161,14 +163,8 @@ public class SurveyAndResponse extends PollWebBaseController {
                         DateQuestion dq = (DateQuestion)question;
                         DateAnswer da = anseswerDao.createDateAnswer();
                         String date[] =  request.getParameterValues(question.getCode());
-                        String dateText = "";
-                        if (date.length==3 && !date[0].isEmpty() && !date[1].isEmpty() && !date[2].isEmpty()){
-                            dateText=String.format("%04d", SecurityLayer.checkNumeric(date[2]))+
-                                    "-"+String.format("%02d", SecurityLayer.checkNumeric(date[0]))+
-                                    "-"+String.format("%02d", SecurityLayer.checkNumeric(date[1]));
-                        }
                         try{
-                            da.setAnswer(LocalDate.parse(dateText));
+                            da.setAnswer(LocalDate.parse(AdditionalFunctions.toDateString(date)));
                             answer = da;
                             answer.setQuestion(dq);
                             if (!answer.isValid()) {                               

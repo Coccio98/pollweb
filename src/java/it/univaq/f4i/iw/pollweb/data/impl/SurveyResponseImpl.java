@@ -71,7 +71,7 @@ public class SurveyResponseImpl implements SurveyResponse{
         if (submissionDate == null) {
             return false;
         }
-        for(Answer answer: this.answers){
+        for(Answer answer: getAnswers()){
             if(!answer.isValid()){
                 return false;
             }

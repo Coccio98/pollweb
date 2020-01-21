@@ -5,6 +5,7 @@
  */
 package it.univaq.f4i.iw.pollweb.controller;
 
+import it.univaq.f4i.iw.framework.result.AdditionalFunctions;
 import it.univaq.f4i.iw.framework.result.CsvFileWriter;
 import it.univaq.f4i.iw.framework.result.FailureResult;
 import it.univaq.f4i.iw.framework.result.TemplateManagerException;
@@ -385,30 +386,16 @@ public class MySurveyVisualizeAndEdit extends PollWebBaseController {
                                         request.getParameterValues("minValue")!=null){
                                     String dateMax[] = request.getParameterValues("maxValue");
                                     //conntrollo sul campo data massima
-                                    if(dateMax.length==3 &&
-                                            !dateMax[0].isEmpty() &&
-                                            !dateMax[1].isEmpty() &&
-                                            !dateMax[2].isEmpty()){
-                                        try{
-                                            LocalDate localDate = LocalDate.parse(String.format("%04d", SecurityLayer.checkNumeric(dateMax[2]))+
-                                                "-"+String.format("%02d", SecurityLayer.checkNumeric(dateMax[0]))+
-                                                "-"+String.format("%02d", SecurityLayer.checkNumeric(dateMax[1])));
-                                            ((DateQuestion)question).setMaxDate(localDate);
-                                        }catch(Exception ex){}
-                                    }
+                                    try{
+                                        LocalDate localDate = LocalDate.parse(AdditionalFunctions.toDateString(dateMax));
+                                        ((DateQuestion)question).setMaxDate(localDate);
+                                    }catch(Exception ex){}
                                     String dateMin[] = request.getParameterValues("minValue");
-                                    //conntrollo sul campo data minima
-                                    if(dateMin.length==3 &&
-                                            !dateMin[0].isEmpty() &&
-                                            !dateMin[1].isEmpty() &&
-                                            !dateMin[2].isEmpty()){
-                                        try{
-                                            LocalDate localDate = LocalDate.parse(String.format("%04d", SecurityLayer.checkNumeric(dateMin[2]))+
-                                                "-"+String.format("%02d", SecurityLayer.checkNumeric(dateMin[0]))+
-                                                "-"+String.format("%02d", SecurityLayer.checkNumeric(dateMin[1])));
-                                            ((DateQuestion)question).setMinDate(localDate);
-                                        }catch(Exception ex){}
-                                    }
+                                    //conntrollo sul campo data minima                                  
+                                    try{
+                                        LocalDate localDate = LocalDate.parse(AdditionalFunctions.toDateString(dateMin));
+                                        ((DateQuestion)question).setMinDate(localDate);
+                                    }catch(Exception ex){}
                                 }
                                 break;
                                 //domanda di tipo choice
@@ -478,6 +465,27 @@ public class MySurveyVisualizeAndEdit extends PollWebBaseController {
         }
     }
     
+    private void show_answers(HttpServletRequest request, HttpServletResponse response, int r)throws IOException, ServletException, TemplateManagerException {
+         try {
+            SurveyDAO dao = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyDAO();
+            Survey survey = dao.findById(r);
+            //verifica dell'appartenenza del sondaggio all'utente loggato
+            if(survey.getManager().getId() == (long)request.getSession().getAttribute("userid")){
+                TemplateResult res = new TemplateResult(getServletContext());
+                request.setAttribute("page_title", "Add User");
+                request.setAttribute("survey", survey);
+                res.activate("answers.ftl.html", request, response);
+                
+            } else {
+                request.setAttribute("message", "This is not your survey");
+                action_error(request, response);
+            }
+        } catch (Exception ex) {
+            request.setAttribute("message", "Data access exception: " + ex.getMessage());
+            action_error(request, response);
+        }
+    }
+    
     @Override
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
@@ -505,7 +513,9 @@ public class MySurveyVisualizeAndEdit extends PollWebBaseController {
                         add_participant(request, response, SecurityLayer.checkNumeric(request.getParameter("u")));
                     } else if(request.getParameter("m1") != null && request.getParameter("m2") != null){
                         edit_question(request, response, SecurityLayer.checkNumeric(request.getParameter("m1")), SecurityLayer.checkNumeric(request.getParameter("m2")));
-                    } else {
+                    } else if(request.getParameter("r")!=null){
+                        show_answers(request, response, SecurityLayer.checkNumeric(request.getParameter("r")));
+                    }else{
                         action_default(request, response);
                     }
                 }

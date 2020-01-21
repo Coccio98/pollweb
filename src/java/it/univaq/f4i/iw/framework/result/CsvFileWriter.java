@@ -36,7 +36,7 @@ public class CsvFileWriter {
             fileWriter = new FileWriter(new File(home + "/Downloads/", "Survey_Response_" + survey.getTitle() +".csv"));
  
             //Write the CSV file header
-            fileWriter.append(FILE_HEADER.toString());
+            fileWriter.append(FILE_HEADER);
              
             //Add a new line separator after the header
             fileWriter.append(NEW_LINE_SEPARATOR);

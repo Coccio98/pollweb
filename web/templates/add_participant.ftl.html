@@ -15,16 +15,16 @@
         </div>
         <div class="rigth">
             <h3>All Participants</h3>
-            <ul class="list">
-                <#list u.getParticipants() as participant>
-                    <h3>
+            <h3>
+                <ul class="list">
+                    <#list u.getParticipants() as participant>
                         <li>
                         ${participant.getName()}
                         ${participant.getEmail()}
                         </li>
-                    </h3>
-                </#list>
-            </ul>
+                    </#list>
+                </ul>
+            </h3>
         </div>
     </div>
 </#if>

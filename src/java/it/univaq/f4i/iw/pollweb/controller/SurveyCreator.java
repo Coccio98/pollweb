@@ -5,6 +5,7 @@
  */
 package it.univaq.f4i.iw.pollweb.controller;
 
+import it.univaq.f4i.iw.framework.result.AdditionalFunctions;
 import it.univaq.f4i.iw.framework.result.FailureResult;
 import it.univaq.f4i.iw.framework.result.TemplateManagerException;
 import it.univaq.f4i.iw.framework.result.TemplateResult;
@@ -25,7 +26,6 @@ import it.univaq.f4i.iw.pollweb.data.dao.Pollweb_DataLayer;
 import it.univaq.f4i.iw.pollweb.data.dao.SurveyDAO;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.ServletException;
@@ -105,73 +105,64 @@ public class SurveyCreator extends PollWebBaseController {
     }
     
     //creazione di una nuova domanda
-    private void action_add_question(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException, TemplateManagerException {
+    private void action_add_question(HttpServletRequest request, HttpServletResponse response, Survey survey) throws IOException, ServletException, TemplateManagerException {
         try{
             TemplateResult res = new TemplateResult(getServletContext());
             QuestionDAO dao = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getQuestionDAO();
-            SurveyDAO surveyDao = (((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyDAO());
-            Survey survey = surveyDao.findById(SecurityLayer.checkNumeric(request.getParameter("surveyId")));
-            //verifica dell'appartenenza del sondaggio all'utente loggato
-            if(survey.getManager().getId() == (long)request.getSession().getAttribute("userid")){
-                //controllo se i campi siano rispettati
-                if(request.getParameter("text") != null &&
-                    request.getParameter("note") != null &&
-                    request.getParameter("mandatory") != null &&
-                    !request.getParameter("text").isEmpty()){
-                    Question q = null;
-                    //vari tipi di domanda
-                    switch(request.getParameter("type")){
-                        case "shortText":
-                            q = dao.createShortTextQuestion();
-                            break;
-                        case "longText":
-                            q = dao.createTextQuestion();
-                            break;
-                        case "number":
-                            q = dao.createNumberQuestion();
+            //controllo se i campi siano rispettati
+            if(request.getParameter("text") != null &&
+                request.getParameter("note") != null &&
+                request.getParameter("mandatory") != null &&
+                !request.getParameter("text").isEmpty()){
+                Question q = null;
+                //vari tipi di domanda
+                switch(request.getParameter("type")){
+                    case "shortText":
+                        q = dao.createShortTextQuestion();
                         break;
-                        case "date":
-                            q = dao.createDateQuestion();
+                    case "longText":
+                        q = dao.createTextQuestion();
                         break;
-                        case "choice":
-                            q = dao.createChoiceQuestion();
-                        break;
-                    default:
-                        request.setAttribute("message", "Invalid Type");
-                        action_error(request, response);
-                    }
-
-                    q.setText(request.getParameter("text"));
-                    q.setNote(request.getParameter("note"));
-                    if(request.getParameter("mandatory").equals("yes")){
-                        q.setMandatory(true);
-                    }else{
-                        q.setMandatory(false);
-                    }
-                    q.setPosition((short)SecurityLayer.checkNumeric(request.getParameter("position")));
-
-                    dao.newQuestion(q, SecurityLayer.checkNumeric(request.getParameter("surveyId")));
-                    request.setAttribute("questionId", q.getId());
-                    request.setAttribute("type", request.getParameter("type"));
-                } else {
-                    request.setAttribute("error_creation", "Fill all mandatory fields");
+                    case "number":
+                        q = dao.createNumberQuestion();
+                    break;
+                    case "date":
+                        q = dao.createDateQuestion();
+                    break;
+                    case "choice":
+                        q = dao.createChoiceQuestion();
+                    break;
+                default:
+                    request.setAttribute("message", "Invalid Type");
+                    action_error(request, response);
                 }
 
-                request.setAttribute("position", request.getParameter("position"));
-                request.setAttribute("surveyId", request.getParameter("surveyId"));
-                
-                //controllo errore
-                if(request.getAttribute("error_creation") != null){               
-                    request.setAttribute("page_title", "Add Question");                
-                } else {                
-                    request.setAttribute("page_title", "Question Rules");
+                q.setText(request.getParameter("text"));
+                q.setNote(request.getParameter("note"));
+                if(request.getParameter("mandatory").equals("yes")){
+                    q.setMandatory(true);
+                }else{
+                    q.setMandatory(false);
                 }
-                res.activate("survey_creation.ftl.html", request, response);
+                q.setPosition((short)SecurityLayer.checkNumeric(request.getParameter("position")));
+
+                dao.newQuestion(q, survey.getId());
+                request.setAttribute("questionId", q.getId());
+                request.setAttribute("type", request.getParameter("type"));
             } else {
-                request.setAttribute("message", "This is not your survey");
-                action_error(request, response);
+                request.setAttribute("error_creation", "Fill all mandatory fields");
             }
 
+            request.setAttribute("position", request.getParameter("position"));
+            request.setAttribute("surveyId", survey.getId());
+
+            //controllo errore
+            if(request.getAttribute("error_creation") != null){               
+                request.setAttribute("page_title", "Add Question");                
+            } else {                
+                request.setAttribute("page_title", "Question Rules");
+            }
+            res.activate("survey_creation.ftl.html", request, response);            
         }catch (Exception ex) {
             request.setAttribute("message", "Data access exception: " + ex.getMessage());
             action_error(request, response);
@@ -179,63 +170,26 @@ public class SurveyCreator extends PollWebBaseController {
     }
     
     //definizione dei requisiti di una nuova domanda
-    private void action_update_question(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException, TemplateManagerException {
+    private void action_update_question(HttpServletRequest request, HttpServletResponse response, Survey survey) throws IOException, ServletException, TemplateManagerException {
         try{
             TemplateResult res = new TemplateResult(getServletContext());
             QuestionDAO dao = ((Pollweb_DataLayer) request.getAttribute("datalayer")).getQuestionDAO();
             int max;
             int min;
-            SurveyDAO surveyDao = (((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyDAO());
-            Survey survey = surveyDao.findById(SecurityLayer.checkNumeric(request.getParameter("surveyId")));
-            //verifica dell'appartenenza del sondaggio all'utente loggato
-            if(survey.getManager().getId() == (long)request.getSession().getAttribute("userid")){
-                //verifica che i campi max e min siano inseriti
-                if(request.getParameter("maxValue") != null &&
-                    request.getParameter("minValue") != null){
-                    //switch per i tipi di domanda
-                    switch(request.getParameter("type")){
-                        //domanda di tipo testo breve
-                        case "shortText":
-                            //controllo se il campo espressione regolare sia presente
-                            if(request.getParameter("expression") != null){
-                                //controllo sulla lunghezza massima
-                                if(request.getParameter("maxValue").isEmpty() || SecurityLayer.checkNumeric(request.getParameter("maxValue")) > 240){
-                                    max = 240;
-                                } else {
-                                    max = SecurityLayer.checkNumeric(request.getParameter("maxValue"));
-                                }
-                                //controllo sulla lunghezza minima
-                                if(request.getParameter("minValue").isEmpty()){
-                                    min = 0;
-                                }else{
-                                    min = SecurityLayer.checkNumeric(request.getParameter("minValue"));
-                                }
-                                //verifica che max sia maggiore o uguale a min
-                                if (max >= min){
-                                    ShortTextQuestion q = dao.createShortTextQuestion();
-                                    q.setId(SecurityLayer.checkNumeric(request.getParameter("questionId")));
-                                    q.setMaxLength(max);
-                                    q.setMinLength(min);
-                                    //controllo sull'espressione regolare
-                                    if(request.getParameter("expression").isEmpty()){
-                                        q.setPattern(".");
-                                    }else{
-                                        q.setPattern(request.getParameter("expression"));
-                                    }
-                                    q.setPosition((short)SecurityLayer.checkNumeric(request.getParameter("position")));
-                                    dao.newQuestion(q, SecurityLayer.checkNumeric(request.getParameter("surveyId")));
-                                    request.setAttribute("page_title", "Add Question");
-                                } else {
-                                    request.setAttribute("error_creation", "Max Length must be bigger than Min Length");
-                                }
-                            }
-                            break;
-                            //domanda di tipo testo lungo
-                        case "longText":{   
+            short p = (short)SecurityLayer.checkNumeric(request.getParameter("position"));
+            //verifica che i campi max e min siano inseriti
+            if(request.getParameter("maxValue") != null &&
+                request.getParameter("minValue") != null){
+                //switch per i tipi di domanda
+                switch(request.getParameter("type")){
+                    //domanda di tipo testo breve
+                    case "shortText":
+                        //controllo se il campo espressione regolare sia presente
+                        if(request.getParameter("expression") != null){
                             //controllo sulla lunghezza massima
-                            if(request.getParameter("maxValue").isEmpty() || SecurityLayer.checkNumeric(request.getParameter("maxValue")) > 10000){
-                                max = 10000;
-                            }else{
+                            if(request.getParameter("maxValue").isEmpty() || SecurityLayer.checkNumeric(request.getParameter("maxValue")) > 240){
+                                max = 240;
+                            } else {
                                 max = SecurityLayer.checkNumeric(request.getParameter("maxValue"));
                             }
                             //controllo sulla lunghezza minima
@@ -246,147 +200,163 @@ public class SurveyCreator extends PollWebBaseController {
                             }
                             //verifica che max sia maggiore o uguale a min
                             if (max >= min){
-                                TextQuestion q = dao.createTextQuestion();
+                                ShortTextQuestion q = dao.createShortTextQuestion();
                                 q.setId(SecurityLayer.checkNumeric(request.getParameter("questionId")));
                                 q.setMaxLength(max);
                                 q.setMinLength(min);
-                                q.setPosition((short)SecurityLayer.checkNumeric(request.getParameter("position")));
-                                dao.newQuestion(q, SecurityLayer.checkNumeric(request.getParameter("surveyId")));
+                                //controllo sull'espressione regolare
+                                if(request.getParameter("expression").isEmpty()){
+                                    q.setPattern(".");
+                                }else{
+                                    q.setPattern(request.getParameter("expression"));
+                                }
+                                q.setPosition(p);
+                                dao.newQuestion(q, survey.getId());
                                 request.setAttribute("page_title", "Add Question");
                             } else {
                                 request.setAttribute("error_creation", "Max Length must be bigger than Min Length");
                             }
                         }
-                            break;
-                            //domanda di tipo numerico
-                        case "number":{ 
-                            //controllo sul valore massimo
-                            if(request.getParameter("maxValue").isEmpty()){
-                                max = Integer.MAX_VALUE;
-                            }else{
-                                max = SecurityLayer.checkNumeric(request.getParameter("maxValue"));
+                        break;
+                        //domanda di tipo testo lungo
+                    case "longText":{   
+                        //controllo sulla lunghezza massima
+                        if(request.getParameter("maxValue").isEmpty() || SecurityLayer.checkNumeric(request.getParameter("maxValue")) > 10000){
+                            max = 10000;
+                        }else{
+                            max = SecurityLayer.checkNumeric(request.getParameter("maxValue"));
+                        }
+                        //controllo sulla lunghezza minima
+                        if(request.getParameter("minValue").isEmpty()){
+                            min = 0;
+                        }else{
+                            min = SecurityLayer.checkNumeric(request.getParameter("minValue"));
+                        }
+                        //verifica che max sia maggiore o uguale a min
+                        if (max >= min){
+                            TextQuestion q = dao.createTextQuestion();
+                            q.setId(SecurityLayer.checkNumeric(request.getParameter("questionId")));
+                            q.setMaxLength(max);
+                            q.setMinLength(min);
+                            q.setPosition(p);
+                            dao.newQuestion(q, survey.getId());
+                            request.setAttribute("page_title", "Add Question");
+                        } else {
+                            request.setAttribute("error_creation", "Max Length must be bigger than Min Length");
+                        }
+                    }
+                        break;
+                        //domanda di tipo numerico
+                    case "number":{ 
+                        //controllo sul valore massimo
+                        if(request.getParameter("maxValue").isEmpty()){
+                            max = Integer.MAX_VALUE;
+                        }else{
+                            max = SecurityLayer.checkNumeric(request.getParameter("maxValue"));
+                        }
+                        //controllo sul valore minimo
+                        if(request.getParameter("minValue").isEmpty()){
+                            min = Integer.MIN_VALUE;
+                        }else{
+                            min = SecurityLayer.checkNumeric(request.getParameter("minValue"));
+                        }
+                        //verifica che max sia maggiore o uguale a min
+                        if (max >= min){
+                            NumberQuestion q = dao.createNumberQuestion();
+                            q.setId(SecurityLayer.checkNumeric(request.getParameter("questionId")));
+                            q.setMaxValue(max);
+                            q.setMinValue(min);
+                            q.setPosition(p);
+                            dao.newQuestion(q, survey.getId());
+                            request.setAttribute("page_title", "Add Question");
+                        } else {
+                            request.setAttribute("error_creation", "Max Value must be bigger than Min Value");
+                        }
+                    }
+                        break;
+                        //domanda di tipo data
+                    case "date":{                       
+                        LocalDate localDateMax;
+                        LocalDate localDateMin;
+                        try{
+                            //controllo sulla data massima
+                            String dateMax[] =  request.getParameterValues("maxValue");                                                 
+                            localDateMax = LocalDate.parse(AdditionalFunctions.toDateString(dateMax));
+                            //controllo sulla data minima
+                            String dateMin[] =  request.getParameterValues("minValue");                         
+                            localDateMin = LocalDate.parse(AdditionalFunctions.toDateString(dateMin));
+                            //verifica che dateMin non sia dopo dateMax
+                            if(!(localDateMin.isAfter(localDateMax))){
+                                DateQuestion q = dao.createDateQuestion();
+                                q.setId(SecurityLayer.checkNumeric(request.getParameter("questionId")));
+                                q.setMaxDate(localDateMax);
+                                q.setMinDate(localDateMin);
+                                q.setPosition(p);
+                                dao.newQuestion(q, survey.getId());
+                                request.setAttribute("page_title", "Add Question");
+                            } else {
+                                request.setAttribute("error_creation", "Max Date must be bigger than Min Date");
                             }
-                            //controllo sul valore minimo
-                            if(request.getParameter("minValue").isEmpty()){
-                                min = Integer.MIN_VALUE;
-                            }else{
-                                min = SecurityLayer.checkNumeric(request.getParameter("minValue"));
+                        }catch(Exception ex){
+                            request.setAttribute("error_creation", "Invalid Date");
+                        }                                                                                                        
+                    }
+                        break;
+                        //domanda di tipo scelta
+                    case "choice":
+                        //controllo se il numero delle selte che dovranno esere aggiunte è presente
+                        if(request.getParameter("number") != null &&
+                            !request.getParameter("number").isEmpty()){
+                            //controllo sul massimo numero di scelte
+                            if(!request.getParameter("maxValue").isEmpty() && SecurityLayer.checkNumeric(request.getParameter("maxValue")) != 0 && 
+                                    SecurityLayer.checkNumeric(request.getParameter("number")) > SecurityLayer.checkNumeric(request.getParameter("maxValue"))){
+                                max = SecurityLayer.checkNumeric(request.getParameter("maxValue"));
+                            } else {
+                                max = SecurityLayer.checkNumeric(request.getParameter("number"));
+                            }
+                            //controllo sul minimo numero di scelte
+                            if(!request.getParameter("minValue").isEmpty()){
+                                min =(short)SecurityLayer.checkNumeric(request.getParameter("minValue"));
+                            } else {
+                                min = 0;
                             }
                             //verifica che max sia maggiore o uguale a min
                             if (max >= min){
-                                NumberQuestion q = dao.createNumberQuestion();
+                                ChoiceQuestion q = dao.createChoiceQuestion();
                                 q.setId(SecurityLayer.checkNumeric(request.getParameter("questionId")));
-                                q.setMaxValue(max);
-                                q.setMinValue(min);
-                                q.setPosition((short)SecurityLayer.checkNumeric(request.getParameter("position")));
-                                dao.newQuestion(q, SecurityLayer.checkNumeric(request.getParameter("surveyId")));
-                                request.setAttribute("page_title", "Add Question");
+                                q.setMaxNumberOfChoices((short)max);
+                                q.setMinNumberOfChoices((short)min);
+                                q.setPosition(p);
+                                dao.newQuestion(q, survey.getId());
+                                request.setAttribute("choices", request.getParameter("number"));
+                                request.setAttribute("questionId", q.getId());
+                                request.setAttribute("type", request.getParameter("type"));
+                                request.setAttribute("page_title", "Add Option");
                             } else {
-                                request.setAttribute("error_creation", "Max Value must be bigger than Min Value");
-                            }
+                                request.setAttribute("error_creation", "Max Choice must be bigger or equalS than Min Choice");
+                            }                            
+                        } else {
+                            request.setAttribute("error_creation", "Fill all mandatory fields");
                         }
-                            break;
-                            //domanda di tipo data
-                        case "date":{                       
-                            LocalDate localDateMax;
-                            LocalDate localDateMin;
-                            try{
-                                //controllo sulla data massima
-                                String dateMax[] =  request.getParameterValues("maxValue");
-                                String dateText = "";
-                                if (dateMax.length==3 && !dateMax[0].isEmpty() && !dateMax[1].isEmpty() && !dateMax[2].isEmpty()){
-                                    dateText=String.format("%04d", SecurityLayer.checkNumeric(dateMax[2]))+
-                                        "-"+String.format("%02d", SecurityLayer.checkNumeric(dateMax[0]))+
-                                        "-"+String.format("%02d", SecurityLayer.checkNumeric(dateMax[1]));
-                                }                            
-                                localDateMax = LocalDate.parse(dateText);
-                                //controllo sulla data minima
-                                String dateMin[] =  request.getParameterValues("minValue");
-                                dateText = "";
-                                if (dateMin.length==3 && !dateMin[0].isEmpty() && !dateMin[1].isEmpty() && !dateMin[2].isEmpty()){
-                                    dateText=String.format("%04d", SecurityLayer.checkNumeric(dateMin[2]))+
-                                        "-"+String.format("%02d", SecurityLayer.checkNumeric(dateMin[0]))+
-                                        "-"+String.format("%02d", SecurityLayer.checkNumeric(dateMin[1]));
-                                }                            
-                                localDateMin = LocalDate.parse(dateText);
-                                //verifica che dateMin non sia dopo dateMax
-                                if(!(localDateMin.isAfter(localDateMax))){
-                                    DateQuestion q = dao.createDateQuestion();
-                                    q.setId(SecurityLayer.checkNumeric(request.getParameter("questionId")));
-                                    q.setMaxDate(localDateMax);
-                                    q.setMinDate(localDateMin);
-                                    q.setPosition((short)SecurityLayer.checkNumeric(request.getParameter("position")));
-                                    dao.newQuestion(q, SecurityLayer.checkNumeric(request.getParameter("surveyId")));
-                                    request.setAttribute("page_title", "Add Question");
-                                } else {
-                                    request.setAttribute("error_creation", "Max Date must be bigger than Min Date");
-                                }
-                            }catch(Exception ex){
-                                request.setAttribute("error_creation", "Invalid Date");
-                            }                                                                                                        
-                        }
-                            break;
-                            //domanda di tipo scelta
-                        case "choice":
-                            //controllo se il numero delle selte che dovranno esere aggiunte è presente
-                            if(request.getParameter("number") != null &&
-                                !request.getParameter("number").isEmpty()){
-                                //controllo sul massimo numero di scelte
-                                if(!request.getParameter("maxValue").isEmpty() && SecurityLayer.checkNumeric(request.getParameter("maxValue")) != 0 && 
-                                        SecurityLayer.checkNumeric(request.getParameter("number")) > SecurityLayer.checkNumeric(request.getParameter("maxValue"))){
-                                    max = SecurityLayer.checkNumeric(request.getParameter("maxValue"));
-                                } else {
-                                    max = SecurityLayer.checkNumeric(request.getParameter("number"));
-                                }
-                                //controllo sul minimo numero di scelte
-                                if(!request.getParameter("minValue").isEmpty()){
-                                    min =(short)SecurityLayer.checkNumeric(request.getParameter("minValue"));
-                                } else {
-                                    min = 0;
-                                }
-                                //verifica che max sia maggiore o uguale a min
-                                if (max >= min){
-                                    ChoiceQuestion q = dao.createChoiceQuestion();
-                                    q.setId(SecurityLayer.checkNumeric(request.getParameter("questionId")));
-                                    q.setMaxNumberOfChoices((short)max);
-                                    q.setMinNumberOfChoices((short)min);
-                                    q.setPosition((short)SecurityLayer.checkNumeric(request.getParameter("position")));
-                                    dao.newQuestion(q, SecurityLayer.checkNumeric(request.getParameter("surveyId")));
-                                    request.setAttribute("choices", request.getParameter("number"));
-                                    request.setAttribute("questionId", q.getId());
-                                    request.setAttribute("type", request.getParameter("type"));
-                                    request.setAttribute("page_title", "Add Option");
-                                } else {
-                                    request.setAttribute("error_creation", "Max Choice must be bigger or equalS than Min Choice");
-                                }                            
-                            } else {
-                                request.setAttribute("error_creation", "Fill all mandatory fields");
-                            }
-                            break;
-                        default:
-                            request.setAttribute("message", "Invalid Type");
-                            action_error(request, response);
-                    }
-                    request.setAttribute("surveyId", request.getParameter("surveyId"));
-                    int p = SecurityLayer.checkNumeric(request.getParameter("position"));
-                    //verifica della presenza di errori, se non ce ne sono aumenta la posizione
-                    if (request.getAttribute("error_creation") == null){               
-                        p++;
-                    } else{
-                        request.setAttribute("questionId", request.getParameter("questionId"));
-                        request.setAttribute("type", request.getParameter("type"));
-                    }                            
-                    request.setAttribute("position", p);
-                    res.activate("survey_creation.ftl.html", request, response);
-                } else {
-                    request.setAttribute("message", "Something goes wrong!");
-                    action_error(request, response);
+                        break;
+                    default:
+                        request.setAttribute("message", "Invalid Type");
+                        action_error(request, response);
                 }
+                request.setAttribute("surveyId", survey.getId());                
+                //verifica della presenza di errori, se non ce ne sono aumenta la posizione
+                if (request.getAttribute("error_creation") == null){               
+                    p++;
+                } else{
+                    request.setAttribute("questionId", request.getParameter("questionId"));
+                    request.setAttribute("type", request.getParameter("type"));
+                }                            
+                request.setAttribute("position", p);
+                res.activate("survey_creation.ftl.html", request, response);
             } else {
-                request.setAttribute("message", "This is not your survey");
+                request.setAttribute("message", "Something goes wrong!");
                 action_error(request, response);
             }
-            
         }catch (Exception ex) {
             request.setAttribute("message", "Data access exception: " + ex.getMessage());
             action_error(request, response);
@@ -394,37 +364,28 @@ public class SurveyCreator extends PollWebBaseController {
     
     }
     //aggiunta delle opzioni ad una domanda a scelta
-    private void action_add_choices(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException, TemplateManagerException {
+    private void action_add_choices(HttpServletRequest request, HttpServletResponse response, Survey survey) throws IOException, ServletException, TemplateManagerException {
         try{
             TemplateResult res = new TemplateResult(getServletContext());
             List<Option> options = new ArrayList<>();
             short i=0;
             OptionDAO optionDao = (((Pollweb_DataLayer) request.getAttribute("datalayer")).getOptionDAO());
-            SurveyDAO surveyDao = (((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyDAO());
-            Survey survey = surveyDao.findById(SecurityLayer.checkNumeric(request.getParameter("surveyId")));
-            //verifica dell'appartenenza del sondaggio all'utente loggato
-            if(survey.getManager().getId() == (long)request.getSession().getAttribute("userid")){
-                //for per prendere e salvare tutte le opzioni inserite
-                for (String s: request.getParameterValues("option")) {
-
-                    Option o = optionDao.createOption();
-                    o.setPosition(i);
-                    o.setText(s);
-                    options.add(o);
-                    i++;
-                }
-                //salvo tutte le opzioni
-                for(Option op: options){
-                    optionDao.saveOrUpdate(op, SecurityLayer.checkNumeric(request.getParameter("questionId")));
-                }
-                request.setAttribute("surveyId", request.getParameter("surveyId"));
-                request.setAttribute("position", request.getParameter("position"));
-                request.setAttribute("page_title", "Add Question");
-                res.activate("survey_creation.ftl.html", request, response);
-            } else {
-                request.setAttribute("message", "This is not your survey");
-                action_error(request, response);
+            //for per prendere e salvare tutte le opzioni inserite
+            for (String s: request.getParameterValues("option")) {
+                Option o = optionDao.createOption();
+                o.setPosition(i);
+                o.setText(s);
+                options.add(o);
+                i++;
             }
+            //salvo tutte le opzioni
+            for(Option op: options){
+                optionDao.saveOrUpdate(op, SecurityLayer.checkNumeric(request.getParameter("questionId")));
+            }
+            request.setAttribute("surveyId", survey.getId());
+            request.setAttribute("position", request.getParameter("position"));
+            request.setAttribute("page_title", "Add Question");
+            res.activate("survey_creation.ftl.html", request, response);
         }catch (Exception ex) {
             request.setAttribute("message", "Data access exception: " + ex.getMessage());
             action_error(request, response);
@@ -443,16 +404,28 @@ public class SurveyCreator extends PollWebBaseController {
             if (SecurityLayer.checkSession(request) != null) {
                 if (request.getParameter("create") != null) {
                     action_create_survey(request, response);    
-                } else if (request.getParameter("addQuestion") != null){
-                    action_add_question(request, response);
-                } else if(request.getParameter("saveQuestion")!= null){
-                    action_update_question(request, response);
-                } else if(request.getParameter("saveOptions")!= null){
-                    action_add_choices(request, response);
+                } else if (request.getParameter("surveyId")!=null){
+                    SurveyDAO surveyDao = (((Pollweb_DataLayer) request.getAttribute("datalayer")).getSurveyDAO());
+                    Survey survey = surveyDao.findById(SecurityLayer.checkNumeric(request.getParameter("surveyId")));
+                    //verifica dell'appartenenza del sondaggio all'utente loggato
+                    if(survey.getManager().getId() == (long)request.getSession().getAttribute("userid")){
+                        if (request.getParameter("addQuestion") != null){
+                            action_add_question(request, response, survey);
+                        } else if(request.getParameter("saveQuestion")!= null){
+                            action_update_question(request, response, survey);
+                        } else if(request.getParameter("saveOptions")!= null){
+                            action_add_choices(request, response, survey);
+                        } else {
+                            action_default(request, response);
+                        }
+                    } else {
+                        request.setAttribute("message", "This is not your survey");
+                        action_error(request, response);
+                    }
                 } else {
                     action_default(request, response);
                 }
-            }else {
+            } else {
                 request.setAttribute("message", "You must be logged");
                 action_error(request, response);
             }

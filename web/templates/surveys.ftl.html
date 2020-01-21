@@ -1,10 +1,12 @@
 <h1>All Surveys</h1>
 <#if (surveys?size > 0)>
-    <ul>
-    <#list surveys as survey>
-    <li>
-        <a href="survey?n=${survey.getId()}">${survey.getTitle()}</a> 
-    </li>
-    </#list>
-</ul>
+    <h3>
+        <ul>
+            <#list surveys as survey>
+            <li>
+                <a href="survey?n=${survey.getId()}">${survey.getTitle()}</a> 
+            </li>
+            </#list>
+        </ul>
+    </h3>
 </#if>

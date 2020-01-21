@@ -13,15 +13,15 @@
                         <input type="text" value="localhost:8080/pollweb/survey?n=${survey.getId()}" disabled="true" class="select">
                     </td>
                     <td>
-                        <div title="Export Response" class="imgButton export" onclick="location.href='my_surveys?exp=${survey.getId()}'">
-                            <img src="images/export.svg" alt="export" class="export-img"/>
-                        </div>
-                    </td>
-                    <td>
                         <#if (survey.isReserved())>
                             <img src="images/add-users.svg" alt="user" title="Add User" class="imgButton" onclick="location.href='my_surveys?u=${survey.getId()}'"/>
                         </#if>
                     </td>
+                    <td>
+                        <div title="Answers" class="imgButton export" onclick="location.href='my_surveys?r=${survey.getId()}'">
+                            <img src="images/exam.svg" alt="export" class="export-img"/>
+                        </div>
+                    </td>                  
                     <td>
                         <#if survey.isActive()>
                             <img src="images/eye.svg" alt="eye" title="Disable" class="imgButton eye green" onclick="location.href='my_surveys?t=${survey.getId()}'"/> 

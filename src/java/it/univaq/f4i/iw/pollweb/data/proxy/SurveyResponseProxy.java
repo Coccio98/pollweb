@@ -27,6 +27,7 @@ public class SurveyResponseProxy extends SurveyResponseImpl {
 
     public SurveyResponseProxy(DataLayer dataLayer) {
         super();
+        super.setAnswers(null);
         this.dataLayer = dataLayer;
         this.dirty = false;
         this.surveyId = 0;

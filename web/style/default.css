@@ -187,7 +187,6 @@ h5 {
 .plus{
     padding-bottom: 5px;
     text-align: center;
-    
 }
 
 .imgButton{
@@ -257,7 +256,14 @@ h5 {
     cursor: text;
 }
 
+.marginAuto{
+    margin: 0 auto;
+    margin-top: 5px;
+}
 
+.wordBreak{
+    word-break: break-all;
+}
 @media only screen and (max-width: 959px) {
     body,html {    
         font-size: 10pt;
@@ -328,5 +334,8 @@ h5 {
     .rigth{
         flex: 0 1 auto;
         margin-left: 0;
+    }
+    textarea {
+        width: 100%;
     }
 }

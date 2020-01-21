@@ -1,0 +1,17 @@
+<#if (survey.getResponses()?size > 0)>
+    <div title="Export Response" class="imgButton export marginAuto" onclick="location.href='my_surveys?exp=${survey.getId()}'">
+        <img src="images/export.svg" alt="export" class="export-img"/>
+    </div>
+    <#list survey.getResponses() as response>
+        <#if (response.getAnswers()?size > 0)>
+            <div class="border wordBreak">            
+                <#list response.getAnswers() as answer>
+                    <h3>${answer.getQuestion().getText()}</h3>
+                    <h4>${answer.toString()}</h4>
+                </#list>            
+            </div>
+        </#if>
+    </#list>
+<#else>
+<h1>No one has answered yet!</h1>
+</#if>

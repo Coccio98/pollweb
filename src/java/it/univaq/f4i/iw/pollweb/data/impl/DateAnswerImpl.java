@@ -48,6 +48,6 @@ public class DateAnswerImpl extends AnswerImpl implements DateAnswer{
     
     @Override
     public String toString() {
-        return String.valueOf(this.getAnswer());
+        return this.getAnswer().toString();
     }
 }
